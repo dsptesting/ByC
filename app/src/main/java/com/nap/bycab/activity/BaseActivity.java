@@ -12,7 +12,7 @@ import com.nap.bycab.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
+    public Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract boolean isToolbarWithBack();
 
-
+    protected abstract int getToolbarColor();
 
     public  boolean isInternetAvailable(){
         ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -39,6 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle(getToolbarTitle());
+            toolbar.setBackgroundColor(getResources().getColor(getToolbarColor()));
             setSupportActionBar(toolbar);
             if(isToolbarWithBack()){
                 toolbar.setNavigationIcon(R.drawable.ic_back);

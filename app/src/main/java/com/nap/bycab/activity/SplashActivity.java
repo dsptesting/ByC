@@ -31,11 +31,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         checkGCMStatus();
-
     }
-
 
     public void checkGCMStatus() {
 
@@ -68,7 +65,6 @@ public class SplashActivity extends AppCompatActivity {
         }
 
     }
-
 
     public boolean isInternetAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -134,9 +130,6 @@ public class SplashActivity extends AppCompatActivity {
             }
         }.execute();
     } // end of getRegId
-
-
-
 
     private void coomonAlertDialog(String title, String message, final boolean isForGCM) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(SplashActivity.this);

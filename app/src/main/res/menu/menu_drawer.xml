@@ -1,0 +1,44 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="nkdroid.tutorial.navigationview.MainActivity">
+    <group android:id="@+id/g1" android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_item_1"
+            android:checked="true"
+            android:icon="@drawable/ic_home"
+            android:title="Home"/>
+        <item
+            android:id="@+id/navigation_item_7"
+            android:icon="@drawable/ic_upcoming_rides"
+            android:title="Upcoming Rides"/>
+        <item
+            android:id="@+id/navigation_item_2"
+            android:icon="@drawable/ic_my_ride"
+            android:title="My Rides"/>
+        <item
+
+            android:id="@+id/navigation_item_3"
+            android:icon="@drawable/ic_my_earning"
+            android:title="My Earnings"/>
+
+    </group>
+
+    <group android:id="@+id/g2" android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_item_4"
+            android:icon="@drawable/ic_contact_us"
+            android:title="Contact Us"/>
+        <item
+            android:id="@+id/navigation_item_5"
+            android:icon="@drawable/ic_about_us"
+            android:title="About Us"/>
+
+
+        <item
+        android:id="@+id/navigation_item_6"
+            android:icon="@drawable/ic_logout"
+        android:title="Logout"/>
+
+</group>
+
+</menu>

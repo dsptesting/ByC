@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/llDrawerHeader"
+    android:clickable="true"
+android:layout_marginTop="@dimen/drawer_height_hack"
+    android:background="@color/drawer_header"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+<LinearLayout
+    android:padding="8dp"
+    android:layout_width="match_parent"
+    android:background="@color/drawer_header"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    >
+
+<ImageView
+    android:padding="4dp"
+    android:src="@drawable/ic_profile"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Nirav Kalola"
+            android:textColor="@color/colorTextPrimary"
+
+            android:textSize="18sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+
+            android:text="9033701373"
+            android:textColor="@color/colorTextSecondary"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+    <ImageView
+        android:src="@drawable/ic_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"/>
+
+    </LinearLayout>
