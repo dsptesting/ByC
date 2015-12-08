@@ -1,6 +1,7 @@
 package com.nap.bycab.activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,7 @@ import com.nap.bycab.R;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    public Toolbar toolbar;
+    public static Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,14 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
+    public static void changeToolbar(String title){
+        toolbar.setBackgroundColor(Color.parseColor("#2196F3"));
+        toolbar.setTitle(title);
+    }
 
+    public static void resetToolbar(){
+        toolbar.setBackgroundColor(Color.parseColor("#00000000"));
+        toolbar.setTitle("");
+    }
 
 }

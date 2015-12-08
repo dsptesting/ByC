@@ -1,5 +1,7 @@
 package com.nap.bycab.activity;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.PersistableBundle;
@@ -16,6 +18,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.nap.bycab.R;
+import com.nap.bycab.fragment.AboutUsFragment;
+import com.nap.bycab.fragment.ContactUsFragment;
+import com.nap.bycab.fragment.HomeFragment;
+import com.nap.bycab.fragment.MyRidesFragment;
+import com.nap.bycab.fragment.MyearningFragment;
+import com.nap.bycab.fragment.UpComingRidesFragment;
 
 public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -65,61 +73,96 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         //default it set first item as selected
         mSelectedId=savedInstanceState ==null ? R.id.navigation_item_1: savedInstanceState.getInt("SELECTED_ID");
         itemSelection(mSelectedId);
-
-//        llDrawerHeader= (LinearLayout) mDrawer.findViewById(R.id.llDrawerHeader);
-//        llDrawerHeader.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent i = new Intent(MainActivity.this, ProfileActivity.class);
-//                startActivity(i);
-//            }
-//        });
+        View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
+        llDrawerHeader= (LinearLayout) headerView.findViewById(R.id.llDrawerHeader);
+        llDrawerHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(i);
+            }
+        });
     }
+
+
 
     private void itemSelection(int mSelectedId) {
 
         Intent i=null;
+        FragmentManager fragmentManager;
+        FragmentTransaction fragmentTransaction;
         switch(mSelectedId){
 
             case R.id.navigation_item_1:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-
+                toolbar.setTitle("");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.full_transperent));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                HomeFragment homeFragment = HomeFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, homeFragment);
+                fragmentTransaction.commit();
                 break;
 
             case R.id.navigation_item_2:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                i=new Intent(MainActivity.this,MyRideActivity.class);
-                startActivity(i);
+                toolbar.setTitle("My Ride");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                MyRidesFragment myRidesFragment = MyRidesFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, myRidesFragment);
+                fragmentTransaction.commit();
                 break;
 
             case R.id.navigation_item_3:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                i=new Intent(MainActivity.this,MyEarningActivity.class);
-                startActivity(i);
+                toolbar.setTitle("My Earning");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                MyearningFragment myearningFragment = MyearningFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, myearningFragment);
+                fragmentTransaction.commit();
                 break;
 
             case R.id.navigation_item_4:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                i=new Intent(MainActivity.this,ContactUsActivity.class);
-                startActivity(i);
+                toolbar.setTitle("Contact Us");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                ContactUsFragment contactUsFragment = ContactUsFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, contactUsFragment);
+                fragmentTransaction.commit();
                 break;
 
             case R.id.navigation_item_5:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                i=new Intent(MainActivity.this,AboutUsActivity.class);
-                startActivity(i);
+                toolbar.setTitle("About Us");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                AboutUsFragment aboutUsFragment = AboutUsFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, aboutUsFragment);
+                fragmentTransaction.commit();
                 break;
 
             case R.id.navigation_item_6:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-//                i=new Intent(MainActivity.this,UpcomingRideActivity.class);
-//                startActivity(i);
+
+                finish();
                 break;
 
             case R.id.navigation_item_7:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                i=new Intent(MainActivity.this,UpcomingRideActivity.class);
-                startActivity(i);
+                toolbar.setTitle("Upcoming Ride");
+                toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                fragmentManager = getFragmentManager();
+                fragmentTransaction = fragmentManager.beginTransaction();
+                UpComingRidesFragment upComingRidesFragment = UpComingRidesFragment.newInstance("","");
+                fragmentTransaction.replace(R.id.main_container, upComingRidesFragment);
+                fragmentTransaction.commit();
                 break;
 
         }
