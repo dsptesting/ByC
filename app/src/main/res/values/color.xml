@@ -8,7 +8,9 @@
     <color name="colorTextSecondary">#727272</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
+    <color name="dark_gray">#2282cc</color><!-- 241d03-->
     <color name="full_transperent">#00000000</color>
     <color name="drawer_header">#f4f4f7</color>
     <color name="divider">#e7e3e3</color>
+    <color name="splash_toolbar">#85dec4</color>
 </resources>

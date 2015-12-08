@@ -7,11 +7,15 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nap.bycab.R;
@@ -31,14 +35,38 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        initUi();
+
         checkGCMStatus();
+    }
+
+    private void initUi() {
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(getResources().getColor(R.color.primaryColorDark));
+
+        }
+
+        findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+                startActivity(i);
+
+            }
+        });
     }
 
     public void checkGCMStatus() {
 
         try {
             if (PrefUtils.getNotificationId(SplashActivity.this).length() > 7) {
-                new CountDownTimer(3000, 1000) {
+                /*new CountDownTimer(3000, 1000) {
                     public void onTick(long millisUntilFinished) {
                     }
                     public void onFinish() {
@@ -46,7 +74,7 @@ public class SplashActivity extends AppCompatActivity {
                         startActivity(i);
                         finish();
                     }
-                }.start();
+                }.start();*/
             } else {
                 if (isInternetAvailable()) {
                     getRegId();

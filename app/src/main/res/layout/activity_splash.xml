@@ -2,27 +2,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:background="#fff"
     tools:context="com.nap.bycab.activity.SplashActivity">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/rlLogin">
 
         <ImageView
-            android:id="@+id/ivBike"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/motorcycle" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/login_bg"
+            android:scaleType="centerCrop"/>
 
-        <TextView
-            android:layout_below="@+id/ivBike"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:textSize="40sp"
-            android:text="ByCab" />
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true">
+
+            <ImageView
+                android:id="@+id/ivBike"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/bile" />
+
+            <com.nap.bycab.custom.FarryRegTextView
+                android:id="@+id/tvTitle"
+                android:layout_below="@+id/ivBike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#fff"
+                android:layout_centerHorizontal="true"
+                android:textSize="40sp"
+                android:text="ByCab" />
+
+            <!--78a395-->
+            <com.nap.bycab.custom.NormalTextView
+                android:layout_below="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textColor="#efefef"
+                android:textSize="15sp"
+                android:layout_centerHorizontal="true"
+                android:text="Just call us wherever you are." />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_gray"
+        android:layout_alignParentBottom="true">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            card_view:cardCornerRadius="3dp"
+            card_view:cardElevation="2sp"
+            card_view:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:clickable="true"
+                android:background="@drawable/primary_selector"
+                android:gravity="center"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:text="LOGIN"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
 
     </RelativeLayout>
 

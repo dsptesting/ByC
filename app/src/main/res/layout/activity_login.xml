@@ -1,0 +1,150 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/login_bg" />
+
+        <Spinner
+            android:id="@+id/spinner1"
+            android:layout_marginTop="100dp"
+            android:layout_width="wrap_content"
+            android:minWidth="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:textColorHint="#efefef"
+            android:textColor="#fff"
+            android:popupBackground="#ffffff"/>
+
+        <View
+            android:id="@+id/vSep"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/spinner1"
+            android:layout_alignLeft="@+id/spinner1"
+            android:layout_alignRight="@+id/spinner1"
+            android:padding="10dp"
+            android:background="#fff"
+            />
+
+        <EditText
+            android:id="@+id/tvMob"
+            android:layout_width="wrap_content"
+            android:minWidth="300dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:layout_below="@+id/vSep"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@android:color/transparent"
+            android:hint="Mobile Number"
+            android:maxLines="1"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:singleLine="true"
+            android:textColorHint="#efefef"
+            android:textColor="#fff"
+            android:inputType="number"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/vSep2"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/tvMob"
+            android:layout_alignLeft="@+id/tvMob"
+            android:layout_alignRight="@+id/tvMob"
+            android:background="#fff"
+            />
+
+        <EditText
+            android:id="@+id/tvPass"
+            android:layout_width="wrap_content"
+            android:minWidth="300dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:layout_below="@+id/vSep2"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@android:color/transparent"
+            android:hint="Password"
+            android:maxLines="1"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:singleLine="true"
+            android:textColorHint="#efefef"
+            android:textColor="#fff"
+            android:inputType="number"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/vSep3"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/tvPass"
+            android:layout_alignLeft="@+id/tvPass"
+            android:layout_alignRight="@+id/tvPass"
+            android:background="#fff"
+            />
+
+        <android.support.v7.widget.CardView
+            android:layout_below="@+id/vSep3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tvPass"
+            android:layout_alignRight="@+id/tvPass"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="1"
+            card_view:cardCornerRadius="3dp"
+            card_view:cardElevation="2sp"
+            card_view:cardUseCompatPadding="true">
+
+            <RelativeLayout
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/primary_selector"
+                android:gravity="center"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:text="LOGIN"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="18sp" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+
+
+
+    </RelativeLayout>
+
+
+    <include layout="@layout/tool_bar_simple" />
+
+</RelativeLayout>

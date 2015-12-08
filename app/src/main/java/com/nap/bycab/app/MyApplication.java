@@ -19,6 +19,9 @@ public class MyApplication extends Application {
     private static Typeface light;
     private static Typeface normal;
     private static Typeface italic;
+    private static Typeface farry;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -27,6 +30,7 @@ public class MyApplication extends Application {
         light = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/light.ttf");
         normal = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/regular.ttf");
         italic = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/italic.ttf");
+        farry = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/farry.otf");
     }
 
     public static Typeface getLightFont() {
@@ -40,6 +44,11 @@ public class MyApplication extends Application {
     public static Typeface getitalicFont() {
         return italic;
     }
+
+    public static Typeface getFarryFont() {
+        return farry;
+    }
+
 
     public static synchronized MyApplication getInstance() {
         return sInstance;
