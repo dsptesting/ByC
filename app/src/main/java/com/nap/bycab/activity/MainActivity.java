@@ -9,33 +9,29 @@ import android.view.View;
 
 import com.nap.bycab.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
-    private Toolbar toolbar;
+    private boolean isInternetAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        setToolbar();
+        isInternetAvailable=isInternetAvailable();
     }
 
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_main;
+    }
 
-    private void setToolbar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+    @Override
+    protected String getToolbarTitle() {
+        return "ByCab";
+    }
 
-        if (toolbar != null) {
-            toolbar.setTitle("ByCab");
-            setSupportActionBar(toolbar);
-
-//            toolbar.setNavigationIcon(R.drawable.ic_back);
-//            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    finish();
-//                }
-//            });
-        }
+    @Override
+    protected boolean isToolbarWithBack() {
+        return false;
     }
 
 
