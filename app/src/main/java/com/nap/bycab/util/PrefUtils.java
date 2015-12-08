@@ -1,6 +1,10 @@
 package com.nap.bycab.util;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 public class PrefUtils {
 
 //    public static void setCurrentUser(User currentUser, Context ctx){
@@ -45,4 +49,17 @@ public class PrefUtils {
 //        GetAssignedForm1 currentUser = complexPreferences.getObject("from1_value", GetAssignedForm1.class);
 //        return currentUser;
 //    }
+
+    public static void setNotificationId(String login, Context ctx){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("notification", login);
+        editor.apply();
+    }
+
+    public static String getNotificationId(Context ctx) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return preferences.getString("notification", "");
+
+    }
 }
