@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -84,6 +85,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         });
     }
 
+    public void openCloseDrawer(){
+
+        if(mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+        }
+        else if(mDrawerLayout != null && !mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+            mDrawerLayout.openDrawer(Gravity.LEFT);
+        }
+    }
 
 
     private void itemSelection(int mSelectedId) {

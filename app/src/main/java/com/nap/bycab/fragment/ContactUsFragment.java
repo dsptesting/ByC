@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nap.bycab.R;
+import com.nap.bycab.activity.MainActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +61,9 @@ public class ContactUsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        ((MainActivity)getActivity()).getSupportActionBar().show();
+
         return inflater.inflate(R.layout.fragment_contact_us, container, false);
     }
 

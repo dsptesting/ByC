@@ -7,28 +7,28 @@ import android.preference.PreferenceManager;
 
 public class PrefUtils {
 
-//    public static void setCurrentUser(User currentUser, Context ctx){
-//        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "user_prefs", 0);
-//        complexPreferences.putObject("current_user_value", currentUser);
-//        complexPreferences.commit();
-//    }
-//
-//
-//
-//    public static User getCurrentUser(Context ctx){
-//        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "user_prefs", 0);
-//        User currentUser = complexPreferences.getObject("current_user_value", User.class);
-//        return currentUser;
-//    }
-//
-//
-//    public static void setNotificationId(String login, Context ctx){
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putString("notification", login);
-//        editor.apply();
-//    }
-//
+    /*public static void setCurrentUser(User currentUser, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "user_prefs", 0);
+        complexPreferences.putObject("current_user_value", currentUser);
+        complexPreferences.commit();
+    }
+
+
+
+    public static User getCurrentUser(Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "user_prefs", 0);
+        User currentUser = complexPreferences.getObject("current_user_value", User.class);
+        return currentUser;
+    }
+
+
+    public static void setNotificationId(String login, Context ctx){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("notification", login);
+        editor.apply();
+    }
+*/
 //    public static String getNotificationId(Context ctx){
 //        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
 //        return preferences.getString("notification", "");
