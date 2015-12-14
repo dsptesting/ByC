@@ -2,22 +2,42 @@ package com.nap.bycab.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.CountDownTimer;
 import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.fragment.AboutUsFragment;
 import com.nap.bycab.fragment.ContactUsFragment;
@@ -25,8 +45,23 @@ import com.nap.bycab.fragment.HomeFragment;
 import com.nap.bycab.fragment.MyRidesFragment;
 import com.nap.bycab.fragment.MyearningFragment;
 import com.nap.bycab.fragment.UpComingRidesFragment;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.nap.bycab.models.CommonResponse;
+import com.nap.bycab.models.LoginResponse;
+import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.PostServiceCall;
+import com.nap.bycab.util.PrefUtils;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener{
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 
     private boolean isInternetAvailable;
     private NavigationView mDrawer;
@@ -34,12 +69,71 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ActionBarDrawerToggle drawerToggle;
     private int mSelectedId;
     private LinearLayout llDrawerHeader;
+
+    //location update
+    protected static final String TAG = "location-updates-sample";
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 30000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    protected GoogleApiClient mGoogleApiClient;
+    protected LocationRequest mLocationRequest;
+    protected Location mCurrentLocation;
+    protected Boolean mRequestingLocationUpdates;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isInternetAvailable=isInternetAvailable();
         setNavigationDrawer(savedInstanceState);
 
+        //location update
+        mRequestingLocationUpdates = false;
+
+        buildGoogleApiClient();
+        mGoogleApiClient.connect();
+
+        LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+            buildAlertMessageNoGps();
+        }
+
+
+            new CountDownTimer(2000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                public void onFinish() {
+                    startUpdatesButtonHandler();
+
+                }
+            }.start();
+
+
+
+    }
+
+    private void buildAlertMessageNoGps() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("Your GPS seems to be disabled, enable it to continue!")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                       finish();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+
+        alert.show();
     }
 
     @Override
@@ -199,6 +293,202 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onSaveInstanceState(outState, outPersistentState);
         //save selected item so it will remains same even after orientation change
         outState.putInt("SELECTED_ID", mSelectedId);
+    }
+
+
+
+    //Location Update Code
+
+    protected synchronized void buildGoogleApiClient() {
+        Log.i(TAG, "Building GoogleApiClient");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+
+    public void startUpdatesButtonHandler() {
+        if (!mRequestingLocationUpdates) {
+            mRequestingLocationUpdates = true;
+            startLocationUpdates();
+        }
+    }
+
+
+    public void stopUpdatesButtonHandler(View view) {
+        if (mRequestingLocationUpdates) {
+            mRequestingLocationUpdates = false;
+            stopLocationUpdates();
+        }
+    }
+
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+
+
+
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+
+        super.onStop();
+    }
+
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.i(TAG, "Connected to GoogleApiClient");
+        if (mCurrentLocation == null) {
+            try {
+                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                final double latitude = mCurrentLocation.getLatitude();
+                final double longitude = mCurrentLocation.getLongitude();
+                new CountDownTimer(2000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    public void onFinish() {
+                        try {
+                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15);
+                            HomeFragment.map.animateCamera(cameraUpdate);
+                            HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }catch ( Exception e){
+                e.printStackTrace();
+            }
+        }
+//        Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
+
+        double latitude = mCurrentLocation.getLatitude();
+        double longitude = mCurrentLocation.getLongitude();
+        try {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 15);
+            HomeFragment.map.animateCamera(cameraUpdate);
+            HomeFragment.map.clear();
+
+            HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
+                Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+//            callLocationUpdate();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.i(TAG, "Connection suspended");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+    }
+
+    private void callLocationUpdate() {
+
+
+        JSONObject object=new JSONObject();
+        try {
+
+
+
+            object.put("Id", 1+"");
+            object.put("Latitude",mCurrentLocation.getLatitude()+"");
+            object.put("Longitude",mCurrentLocation.getLongitude()+"");
+
+            Log.e("location update :",object+"");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.UPDATE_LOCATION,object){
+
+            @Override
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e("login Response: ",response+"");
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                }  else {
+                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                progressDialog.dismiss();
+            }
+        }.call();
+
+
     }
 
 

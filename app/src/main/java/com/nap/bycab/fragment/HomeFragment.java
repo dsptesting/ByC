@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -42,7 +43,7 @@ import com.nap.bycab.util.MapStateListener;
 import com.nap.bycab.util.TouchableMapFragment;
 import com.nap.bycab.util.TouchableWrapper;
 
-public class HomeFragment extends Fragment implements LocationListener{
+public class HomeFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -50,10 +51,13 @@ public class HomeFragment extends Fragment implements LocationListener{
     private String mParam1;
     private String mParam2;
     private MapView mapView;
-    private GoogleMap map;
+    public static GoogleMap map;
     private View view;
     private LocationManager manager;
     private View locationButton;
+
+
+
 
 
     public static HomeFragment newInstance(String param1, String param2) {
@@ -84,19 +88,7 @@ public class HomeFragment extends Fragment implements LocationListener{
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
-       /* mTouchView = new TouchableWrapper(getActivity());
-        mTouchView.addView(view);
-        mTouchView.setTouchListener(new TouchableWrapper.OnTouchListener() {
-            @Override
-            public void onTouch() {
-                Log.v("ByCab"," OnCam onTouch ");
-            }
 
-            @Override
-            public void onRelease() {
-                Log.v("ByCab"," OnCam onRelease ");
-            }
-        });*/
 
         ((MainActivity)getActivity()).getSupportActionBar().hide();
 
@@ -104,7 +96,7 @@ public class HomeFragment extends Fragment implements LocationListener{
             getActivity().finish();
         }
 
-        initData();
+
 
         initUi();
 
@@ -118,40 +110,8 @@ public class HomeFragment extends Fragment implements LocationListener{
         return view;
     }
 
-    /*@Override
-    public View getView() {
-        return view;
-    }
-*/
-    private void initData() {
-        manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
 
-        if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-            buildAlertMessageNoGps();
-        }
-    }
 
-    private void buildAlertMessageNoGps() {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Your GPS seems to be disabled, enable it to continue!")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                        getActivity().finish();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-
-        alert.show();
-    }
 
     private void initUi() {
 
@@ -169,8 +129,7 @@ public class HomeFragment extends Fragment implements LocationListener{
      * */
     private void initilizeMap(Bundle savedInstanceState) {
 
-        /*SupportMapFragment supportmapfragment = (SupportMapFragment)fragment;
-        GoogleMap supportMap = supportmapfragment.getMap();*/
+
 
         mapView = (MapView) view.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
@@ -178,40 +137,38 @@ public class HomeFragment extends Fragment implements LocationListener{
         // Gets to GoogleMap from the MapView and does initialization stuff
         map = mapView.getMap();
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.getUiSettings().setMyLocationButtonEnabled(false);
         map.getUiSettings().setCompassEnabled(false);
         map.getUiSettings().setZoomGesturesEnabled(true);
-        map.setMyLocationEnabled(true);
+        map.setMyLocationEnabled(false);
 
         // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
         MapsInitializer.initialize(this.getActivity());
-
+         //This goes up to 21
+        LatLng latLng=new LatLng(map.getMyLocation().getLatitude(),map.getMyLocation().getLongitude());
+//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
+//        Location location=((MainActivity)getActivity()).getCurrentLocation();
         // Updates the location and zoom of the MapView
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(22.3000905, 73.171817), 15);
-        map.animateCamera(cameraUpdate);
+//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), 10);
+//        map.animateCamera(cameraUpdate);
 
         // Get the button view
-        locationButton = (View) view.findViewById(Integer.parseInt("2"));
-        locationButton.setVisibility(View.VISIBLE);
+//        locationButton = (View) view.findViewById(Integer.parseInt("2"));
+//        locationButton.setVisibility(View.VISIBLE);
 
-        TypedValue tv = new TypedValue();
-        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+//        TypedValue tv = new TypedValue();
+//        if (getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+//            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+//
+//            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+//            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+//            map.setPadding(getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp), actionBarHeight + getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp) + getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp), 0, 0);
+//            locationButton.setLayoutParams(rlp);
+//        }
 
-            RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-            rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            map.setPadding(getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp), actionBarHeight + getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp) + getActivity().getResources().getDimensionPixelSize(R.dimen.v15dp), 0, 0);
-            locationButton.setLayoutParams(rlp);
-        }
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Log.v("ByCab","OnMapCLick");
-            }
-        });
     }
 
     @Override
@@ -239,31 +196,7 @@ public class HomeFragment extends Fragment implements LocationListener{
         if(mapView != null) mapView.onLowMemory();
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
 
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        map.addMarker(new MarkerOptions().position(latLng));
-        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        map.animateCamera(CameraUpdateFactory.zoomTo(15));
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     private boolean isGooglePlayServicesAvailable() {
 
