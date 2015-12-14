@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:id="@+id/mRootLayout"
     android:layout_height="match_parent"
     xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
@@ -14,6 +15,7 @@
             android:src="@drawable/login_bg" />
 
         <Spinner
+            android:background="#00000000"
             android:id="@+id/spinner1"
             android:layout_marginTop="100dp"
             android:layout_width="wrap_content"
@@ -24,7 +26,7 @@
             android:layout_marginRight="30dp"
             android:paddingRight="10dp"
             android:paddingLeft="10dp"
-            android:textColorHint="#efefef"
+            android:textColorHint="#fff"
             android:textColor="#fff"
             android:popupBackground="#ffffff"/>
 
@@ -88,7 +90,7 @@
             android:singleLine="true"
             android:textColorHint="#efefef"
             android:textColor="#fff"
-            android:inputType="number"
+            android:inputType="text"
             android:textSize="16sp" />
 
         <View
@@ -145,6 +147,6 @@
     </RelativeLayout>
 
 
-    <include layout="@layout/tool_bar_simple" />
+    <include layout="@layout/app_bar" />
 
 </RelativeLayout>

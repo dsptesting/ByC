@@ -55,14 +55,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
 
-    public static void changeToolbar(String title){
-        toolbar.setBackgroundColor(Color.parseColor("#2196F3"));
-        toolbar.setTitle(title);
-    }
 
-    public static void resetToolbar(){
-        toolbar.setBackgroundColor(Color.parseColor("#00000000"));
-        toolbar.setTitle("");
-    }
 
 }

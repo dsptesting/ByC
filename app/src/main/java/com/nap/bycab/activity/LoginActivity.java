@@ -1,14 +1,19 @@
 package com.nap.bycab.activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,185 +23,209 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
+import com.nap.bycab.models.LoginResponse;
+import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.PostServiceCall;
+import com.nap.bycab.util.PrefUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends BaseActivity {
 
     private Spinner spinner1;
     private ArrayList<String> list;
     private int pos;
-    private Toolbar toolbar;
+    private RelativeLayout mRootLayout;
+    private EditText tvMob,tvPass;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
         initUi();
+    }
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    protected String getToolbarTitle() {
+        return "Login";
+    }
+
+    @Override
+    protected boolean isToolbarWithBack() {
+        return true;
+    }
+
+    @Override
+    protected int getToolbarColor() {
+        return android.R.color.transparent;
     }
 
     private void initUi() {
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
-
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
-        getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                onBackPressed();
-            }
-        });
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.setStatusBarColor(getResources().getColor(R.color.primaryColorDark));
-        }
-
         list = new ArrayList<>();
+        list.add("Select Service");
         list.add("Pickup/Dropoff");
         list.add("Delivery");
         list.add("Driver");
         list.add("Service");
-        list.add("Select Service");
+
 
         spinner1 = (Spinner) findViewById(R.id.spinner1);
-
-        final HintAdapter adapter = new HintAdapter(this, list, R.layout.item_spinner_outter);
-        adapter.setDropDownViewResource(R.layout.item_spinner);
-        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner1.setAdapter(adapter);
-
-        pos = adapter.getCount();
-        setSpinnerSelectionWithoutCallingListener(spinner1, pos);
-
+        CustomSpinnerAdapter customSpinnerAdapter=new CustomSpinnerAdapter(LoginActivity.this,list);
+        spinner1.setAdapter(customSpinnerAdapter);
 
         findViewById(R.id.btnLogin).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(i);
+                tvMob= (EditText) findViewById(R.id.tvMob);
+                tvPass= (EditText) findViewById(R.id.tvPass);
+                mRootLayout= (RelativeLayout) findViewById(R.id.mRootLayout);
+                if(spinner1.getSelectedItemPosition()==0){
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Select Service Type", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                } else if(tvMob.getText().toString().length() !=10) {
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Valid Number", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                } else if(tvPass.getText().toString().trim().length()==0) {
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Password", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                }else {
+
+//                    callLoginService();
+
+                    // for temp testing
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }
+
 
             }
         });
     }
 
-    private void setSpinnerSelectionWithoutCallingListener(final Spinner spinner, final int selection) {
+    private void callLoginService() {
 
-        final AdapterView.OnItemSelectedListener l = spinner.getOnItemSelectedListener();
 
-        spinner.setOnItemSelectedListener(null);
+        JSONObject object=new JSONObject();
+        try {
+            object.put("NotificationId",PrefUtils.getNotificationId(LoginActivity.this)+"");
+            object.put("ServiceType",spinner1.getSelectedItemPosition()+"");
+            object.put("Mobile",tvMob.getText().toString().trim());
+            object.put("Password",tvPass.getText().toString().trim());
+            Log.e("login request:",object+"");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        spinner.post(new Runnable() {
+        final ProgressDialog progressDialog=new ProgressDialog(LoginActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.LOGIN,object){
+
             @Override
-            public void run() {
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e("login Response: ",response+"");
+                LoginResponse loginResponse=new GsonBuilder().create().fromJson(response,LoginResponse.class);
 
-                spinner.setSelection(selection, false);
+                if(loginResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(mRootLayout, loginResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
 
-                spinner.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        spinner.setOnItemSelectedListener(new MyOnItemSelectedListener());
-                    }
-                });
+                } else {
+                    PrefUtils.setCurrentDriver(loginResponse.getDriver(), LoginActivity.this);
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }
             }
-        });
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if(spinner1 != null)
-            spinner1.post(new Runnable() {
             @Override
-            public void run() {
-                spinner1.setOnItemSelectedListener(new MyOnItemSelectedListener());
+            public void error(String error) {
+                progressDialog.dismiss();
             }
-        });
+        }.call();
+
+
     }
 
-    /**
-     *  Selection listener supplied to spinner.
-     */
-    public class MyOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+
+    public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
+
+        private final Context activity;
+        private ArrayList<String> asr;
+
+        public CustomSpinnerAdapter(Context context,ArrayList<String> asr) {
+            this.asr=asr;
+            activity = context;
+        }
+
+        public int getCount()
+        {
+            return asr.size();
+        }
+
+        public Object getItem(int i)
+        {
+            return asr.get(i);
+        }
+
+        public long getItemId(int i)
+        {
+            return (long)i;
+        }
+
 
         @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-/*
-            String fileText = readFromFile(new File(getActivity().getFilesDir(), list.get(position)));
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            TextView txt = new TextView(LoginActivity.this);
+            txt.setPadding(16, 16, 16, 16);
+            txt.setTextSize(18);
+            txt.setGravity(Gravity.CENTER_VERTICAL);
+            txt.setText(asr.get(position));
+            txt.setTextColor(Color.parseColor("#000000"));
+            return  txt;
 
-            if (fileText != null && fileText.length() > 0) {
 
-                Log.v("Try",""+fileText);
-
-                tvFileText.setText("" + fileText);
-            }*/
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
 
         }
-    }
 
-    public class HintAdapter extends ArrayAdapter<String> {
-
-        List<String> objects;
-
-        public HintAdapter(Context theContext, List<String> objects, int theLayoutResId) {
-            super(theContext, theLayoutResId, objects);
-            this.objects = objects;
+        public View getView(int i, View view, ViewGroup viewgroup) {
+            TextView txt = new TextView(LoginActivity.this);
+            txt.setGravity(Gravity.CENTER_VERTICAL);
+            txt.setPadding(0, 0, -20, -20);
+            txt.setTextSize(16);
+            txt.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_down, 0);
+            txt.setText(asr.get(i));
+            txt.setTextColor(Color.parseColor("#ffffff"));
+            return  txt;
         }
-
-        @Override
-        public int getCount() {
-            // don't display last item. It is used as hint.
-            int count = super.getCount();
-            return count > 0 ? count - 1 : count;
-        }
-/*
-
-        @Override
-        public View getDropDownView(int position, View cnvtView, ViewGroup prnt) {
-            return getCustomView(position, cnvtView, prnt);
-        }
-
-        @Override
-        public View getView(int pos, View cnvtView, ViewGroup prnt) {
-            return getCustomView(pos, cnvtView, prnt);
-        }
-
-        public View getCustomView(int position, View convertView, ViewGroup parent) {
-
-            LayoutInflater inflater = getLayoutInflater();
-            View mySpinner = inflater.inflate(R.layout.item_spinner, parent, false);
-            TextView main_text = (TextView) mySpinner.findViewById(R.id.tvSpnText);
-            main_text.setText(objects.get(position));
-
-            return mySpinner;
-        }
-*/
-
     }
 
 

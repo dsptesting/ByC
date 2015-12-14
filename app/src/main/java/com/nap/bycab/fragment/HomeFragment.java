@@ -54,8 +54,7 @@ public class HomeFragment extends Fragment implements LocationListener{
     private View view;
     private LocationManager manager;
     private View locationButton;
-   private TouchableWrapper mTouchView;
-    private boolean mMapIsTouched;
+
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -135,19 +134,22 @@ public class HomeFragment extends Fragment implements LocationListener{
     private void buildAlertMessageNoGps() {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+        builder.setMessage("Your GPS seems to be disabled, enable it to continue!")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
                         startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         dialog.cancel();
+                        getActivity().finish();
                     }
                 });
         final AlertDialog alert = builder.create();
+
         alert.show();
     }
 
