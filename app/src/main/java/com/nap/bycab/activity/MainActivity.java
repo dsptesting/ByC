@@ -53,6 +53,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.nap.bycab.models.CommonResponse;
+import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.LoginResponse;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
@@ -69,6 +70,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ActionBarDrawerToggle drawerToggle;
     private int mSelectedId;
     private LinearLayout llDrawerHeader;
+    private Driver driver;
 
     //location update
     protected static final String TAG = "location-updates-sample";
@@ -85,7 +87,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
         isInternetAvailable=isInternetAvailable();
         setNavigationDrawer(savedInstanceState);
-
+      driver=PrefUtils.getCurrentDriver(MainActivity.this);
         //location update
         mRequestingLocationUpdates = false;
 
@@ -254,7 +256,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             case R.id.navigation_item_6:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-
+                PrefUtils.clearCurrentDriver(MainActivity.this);
+                Intent ii=new Intent(MainActivity.this,LoginActivity.class);
+                startActivity(ii);
                 finish();
                 break;
 
@@ -450,7 +454,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
 
-            object.put("Id", 1+"");
+            object.put("Id", driver.getDriverId()+"");
             object.put("Latitude",mCurrentLocation.getLatitude()+"");
             object.put("Longitude",mCurrentLocation.getLongitude()+"");
 

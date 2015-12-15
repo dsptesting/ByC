@@ -15,7 +15,11 @@ public class PrefUtils {
         complexPreferences.commit();
     }
 
-
+    public static void clearCurrentDriver( Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "Driver_prefs", 0);
+        complexPreferences.clearObject();
+        complexPreferences.commit();
+    }
 
     public static Driver getCurrentDriver(Context ctx){
         ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "Driver_prefs", 0);

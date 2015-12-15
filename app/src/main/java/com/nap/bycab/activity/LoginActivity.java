@@ -101,36 +101,33 @@ public class LoginActivity extends BaseActivity {
 
 
 
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(i);
-                finish();
 
 
 
-//                tvMob= (EditText) findViewById(R.id.tvMob);
-//                tvPass= (EditText) findViewById(R.id.tvPass);
-//                mRootLayout= (RelativeLayout) findViewById(R.id.mRootLayout);
-//                if(spinner1.getSelectedItemPosition()==0){
-//                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Select Service Type", Snackbar.LENGTH_LONG);
-//                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-//                    snackbar.show();
-//                } else if(tvMob.getText().toString().length() !=10) {
-//                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Valid Number", Snackbar.LENGTH_LONG);
-//                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-//                    snackbar.show();
-//                } else if(tvPass.getText().toString().trim().length()==0) {
-//                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Password", Snackbar.LENGTH_LONG);
-//                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-//                    snackbar.show();
-//                }else {
-//
-////                    callLoginService();
-//
+                tvMob= (EditText) findViewById(R.id.tvMob);
+                tvPass= (EditText) findViewById(R.id.tvPass);
+                mRootLayout= (RelativeLayout) findViewById(R.id.mRootLayout);
+                if(spinner1.getSelectedItemPosition()==0){
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Select Service Type", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                } else if(tvMob.getText().toString().length() !=10) {
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Valid Number", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                } else if(tvPass.getText().toString().trim().length()==0) {
+                    Snackbar snackbar=Snackbar.make(mRootLayout, "Please Enter Password", Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                }else {
+
+                    callLoginService();
+
 //                    // for temp testing
 //                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
 //                    startActivity(i);
 //                    finish();
-//                }
+                }
 
 
             }

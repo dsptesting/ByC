@@ -37,8 +37,33 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         initUi();
+        try {
+            if (PrefUtils.getCurrentDriver(SplashActivity.this) != null) {
 
-        checkGCMStatus();
+                findViewById(R.id.btnLogin).setVisibility(View.GONE);
+                new CountDownTimer(2000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+
+                    }
+
+                    public void onFinish() {
+
+                        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                }.start();
+            } else {
+                findViewById(R.id.btnLogin).setVisibility(View.VISIBLE);
+                checkGCMStatus();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            checkGCMStatus();
+        }
+
+
     }
 
     private void initUi() {
