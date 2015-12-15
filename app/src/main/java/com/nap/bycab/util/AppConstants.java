@@ -5,6 +5,10 @@ package com.nap.bycab.util;
  */
 public class AppConstants {
 
+    public static final boolean DEBUG = true;
+
+    public static final String DEBUG_TAG = "bycab";
+
     public static final String DOMAIN_NAME="http://nap91296.com/";
 
     public static final String LOGIN=DOMAIN_NAME+"ByKabService/User.svc/json/CheckLogin";

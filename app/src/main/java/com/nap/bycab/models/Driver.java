@@ -26,6 +26,8 @@ public class Driver {
     @SerializedName("VehicalDesc")
     private String vehicleDescription;
 
+    private String driverStatus;
+
 
     public Driver() {
         // empty constructor
@@ -113,5 +115,13 @@ public class Driver {
 
     public void setVehicleDescription(String vehicleDescription) {
         this.vehicleDescription = vehicleDescription;
+    }
+
+    public String getDriverStatus() {
+        return driverStatus;
+    }
+
+    public void setDriverStatus(String driverStatus) {
+        this.driverStatus = driverStatus;
     }
 }

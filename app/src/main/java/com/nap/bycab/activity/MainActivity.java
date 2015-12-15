@@ -19,13 +19,16 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -69,8 +72,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private int mSelectedId;
-    private LinearLayout llDrawerHeader;
+    private TextView tvEditProfile;
     private Driver driver;
+    private SwitchCompat switchDriverStatus;
 
     //location update
     protected static final String TAG = "location-updates-sample";
@@ -86,8 +90,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isInternetAvailable=isInternetAvailable();
+
+        driver=PrefUtils.getCurrentDriver(MainActivity.this);
+
         setNavigationDrawer(savedInstanceState);
-      driver=PrefUtils.getCurrentDriver(MainActivity.this);
+
         //location update
         mRequestingLocationUpdates = false;
 
@@ -99,22 +106,69 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             buildAlertMessageNoGps();
         }
 
+        new CountDownTimer(2000, 1000) {
 
-            new CountDownTimer(2000, 1000) {
+            public void onTick(long millisUntilFinished) {
 
-                public void onTick(long millisUntilFinished) {
+            }
 
-                }
+            public void onFinish() {
+                if(mGoogleApiClient.isConnected()) startUpdatesButtonHandler();
 
-                public void onFinish() {
-                    startUpdatesButtonHandler();
-
-                }
-            }.start();
-
+            }
+        }.start();
 
 
     }
+
+    private void callDriverStatusService(boolean isChecked) {
+
+        final JSONObject object=new JSONObject();
+        try {
+            object.put("Id",PrefUtils.getCurrentDriver(MainActivity.this).getDriverId()+"");
+            object.put("Status",""+isChecked);
+            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.UPDATE_DRIVER_STATUS,object){
+
+            @Override
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                } else {
+
+                    Driver mDriver = PrefUtils.getCurrentDriver(MainActivity.this);
+                    try {
+                        mDriver.setDriverStatus(object.getString("Status"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    PrefUtils.setCurrentDriver(mDriver, MainActivity.this);
+
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                progressDialog.dismiss();
+            }
+        }.call();
+    }
+
 
     private void buildAlertMessageNoGps() {
 
@@ -171,12 +225,24 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         mSelectedId=savedInstanceState ==null ? R.id.navigation_item_1: savedInstanceState.getInt("SELECTED_ID");
         itemSelection(mSelectedId);
         View headerView = mDrawer.inflateHeaderView(R.layout.drawer_header);
-        llDrawerHeader= (LinearLayout) headerView.findViewById(R.id.llDrawerHeader);
-        llDrawerHeader.setOnClickListener(new View.OnClickListener() {
+        tvEditProfile= (TextView) headerView.findViewById(R.id.tvEditProfile);
+        tvEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, ProfileActivity.class);
                 startActivity(i);
+            }
+        });
+
+        ((TextView)headerView.findViewById(R.id.tvDriverName)).setText("" + driver.getName());
+        ((TextView)headerView.findViewById(R.id.tvDriverMobile)).setText("" + driver.getMobileNo());
+
+        switchDriverStatus = (SwitchCompat) headerView.findViewById(R.id.switchDriverStatus);
+        switchDriverStatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                callDriverStatusService(isChecked);
             }
         });
     }

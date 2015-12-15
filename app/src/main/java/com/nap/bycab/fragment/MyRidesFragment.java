@@ -1,22 +1,35 @@
 package com.nap.bycab.fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.BaseActivity;
 import com.nap.bycab.activity.MainActivity;
+import com.nap.bycab.models.Order;
 import com.nap.bycab.models.Ride;
+import com.nap.bycab.models.UpcomingRideResponse;
+import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.PostServiceCall;
+import com.nap.bycab.util.PrefUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,11 +37,12 @@ import java.util.Date;
 public class MyRidesFragment extends Fragment {
 
     private ListView lvUpcomingRides;
-    private ArrayList<Ride> alUpcomingRides;
+    private ArrayList<Order> alRides;
     private MyAdapter myAdapter;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private View view;
+    private FrameLayout flMyRides;
 
     private String mParam1;
     private String mParam2;
@@ -68,14 +82,61 @@ public class MyRidesFragment extends Fragment {
 
         initUi();
 
+        callRidesService();
+
         return view;
     }
 
+    private void callRidesService() {
+
+
+        JSONObject object = new JSONObject();
+        try {
+            object.put("Id", PrefUtils.getCurrentDriver(getActivity()).getDriverId() + "");
+            Log.e(AppConstants.DEBUG_TAG, "callRidesService request: " + object.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.MY_RIDES, object) {
+
+            @Override
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e(AppConstants.DEBUG_TAG, "callUpcomingRidesService Response: " + response);
+                UpcomingRideResponse upcomingRideResponse = new GsonBuilder().create().fromJson(response, UpcomingRideResponse.class);
+
+                if (upcomingRideResponse.getResponseId().equalsIgnoreCase("0")) {
+                    Snackbar snackbar = Snackbar.make(flMyRides, upcomingRideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                } else {
+                    // PrefUtils.setCurrentDriver(loginResponse.getDriver(),getActivity());
+
+                    alRides.clear();
+                    alRides.addAll(upcomingRideResponse.getAlUpcomingRides());
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                progressDialog.dismiss();
+            }
+        }.call();
+    }
+
+
     private void initData() {
 
-        alUpcomingRides = new ArrayList<>();
+        alRides = new ArrayList<>();
 
-        Ride ride1= new Ride();
+        flMyRides = (FrameLayout) view.findViewById(R.id.flMyRides);
+        /*Ride ride1= new Ride();
         ride1.setCustomerMobile("09898989898");
         ride1.setCustomerName("Darji Palak Suresh");
         ride1.setDateTime(new Date().getTime());
@@ -95,14 +156,14 @@ public class MyRidesFragment extends Fragment {
         ride2.setFare("Rs 64 - Rs 78");
         ride2.setSrc("163, Ajit nagar, Urmi char rasta, Akota, Vadodara -390020");
         ride2.setDes("Pujer complex, Subhanpura, Vadodara -390020");
-        alUpcomingRides.add(ride2);
+        alUpcomingRides.add(ride2);*/
     }
 
     private void initUi() {
 
         lvUpcomingRides = (ListView) view.findViewById(R.id.lvUpcomingRides);
 
-        myAdapter = new MyAdapter(getActivity(), alUpcomingRides);
+        myAdapter = new MyAdapter(getActivity(), alRides);
 
         lvUpcomingRides.setAdapter(myAdapter);
     }
@@ -110,10 +171,10 @@ public class MyRidesFragment extends Fragment {
     private class MyAdapter extends BaseAdapter {
 
         Context context;
-        ArrayList<Ride> al;
+        ArrayList<Order> al;
         LayoutInflater inflater;
 
-        MyAdapter(Context context, ArrayList<Ride> al){
+        MyAdapter(Context context, ArrayList<Order> al){
 
             this.context = context;
             inflater = LayoutInflater.from(this.context);
@@ -170,10 +231,10 @@ public class MyRidesFragment extends Fragment {
             viewHolder.tvSrc.setVisibility(View.GONE);
             viewHolder.tvDes.setVisibility(View.GONE);
 
-            viewHolder.tvCustomerMobile.setText(""+ al.get(position).getCustomerMobile());
-            viewHolder.tvCustomerName.setText(""+ al.get(position).getCustomerName());
-            viewHolder.tvPrice.setText(""+ al.get(position).getFare());
-            viewHolder.tvKms.setText(""+ al.get(position).getKms());
+            viewHolder.tvCustomerMobile.setText(""+ al.get(position).getCustMobile());
+            viewHolder.tvCustomerName.setText(""+ al.get(position).getCustName());
+            viewHolder.tvPrice.setText("" + al.get(position).getAmount());
+            viewHolder.tvKms.setText(""+ al.get(position).getKM()+" kms");
 
             return convertView;
         }
