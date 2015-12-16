@@ -58,6 +58,7 @@ import com.google.android.gms.location.LocationServices;
 import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.LoginResponse;
+import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
@@ -75,6 +76,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private TextView tvEditProfile;
     private Driver driver;
     private SwitchCompat switchDriverStatus;
+    private boolean isForCurrentRide;
 
     //location update
     protected static final String TAG = "location-updates-sample";
@@ -90,6 +92,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isInternetAvailable=isInternetAvailable();
+
+        isForCurrentRide=getIntent().getBooleanExtra("is_current_ride",false);
+
 
         driver=PrefUtils.getCurrentDriver(MainActivity.this);
 
@@ -118,7 +123,59 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         }.start();
 
+        if(isForCurrentRide){
+            callCurrentRideService();
+        }
 
+
+    }
+
+    private void callCurrentRideService() {
+
+        final JSONObject object=new JSONObject();
+        try {
+            object.put("Id",PrefUtils.getCurrentDriver(MainActivity.this).getDriverId()+"");
+
+            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.UPDATE_DRIVER_STATUS,object){
+
+            @Override
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                } else {
+
+                    RideResponse mDriver = PrefUtils.getCurrentDriver(MainActivity.this);
+                    try {
+                        mDriver.setDriverStatus(object.getString("Status"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    PrefUtils.setCurrentDriver(mDriver, MainActivity.this);
+
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                progressDialog.dismiss();
+            }
+        }.call();
     }
 
     private void callDriverStatusService(boolean isChecked) {

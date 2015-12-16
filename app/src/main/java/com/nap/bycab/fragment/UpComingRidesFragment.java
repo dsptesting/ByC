@@ -3,7 +3,6 @@ package com.nap.bycab.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.Snackbar;
@@ -18,12 +17,9 @@ import android.widget.TextView;
 
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
-import com.nap.bycab.activity.BaseActivity;
 import com.nap.bycab.activity.MainActivity;
-import com.nap.bycab.models.LoginResponse;
 import com.nap.bycab.models.Order;
-import com.nap.bycab.models.Ride;
-import com.nap.bycab.models.UpcomingRideResponse;
+import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
@@ -32,7 +28,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class UpComingRidesFragment extends Fragment {
 
@@ -144,10 +139,10 @@ public class UpComingRidesFragment extends Fragment {
             public void response(String response) {
                 progressDialog.dismiss();
                 Log.e(AppConstants.DEBUG_TAG, "callUpcomingRidesService Response: "+response);
-                UpcomingRideResponse upcomingRideResponse=new GsonBuilder().create().fromJson(response,UpcomingRideResponse.class);
+                RideResponse rideResponse =new GsonBuilder().create().fromJson(response,RideResponse.class);
 
-                if(upcomingRideResponse.getResponseId().equalsIgnoreCase("0")){
-                    Snackbar snackbar=Snackbar.make(rootUpcomingRides, upcomingRideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                if(rideResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(rootUpcomingRides, rideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
 
@@ -156,7 +151,7 @@ public class UpComingRidesFragment extends Fragment {
                    // PrefUtils.setCurrentDriver(loginResponse.getDriver(),getActivity());
 
                     alUpcomingRides.clear();
-                    alUpcomingRides.addAll(upcomingRideResponse.getAlUpcomingRides());
+                    alUpcomingRides.addAll(rideResponse.getAlUpcomingRides());
                     myAdapter.notifyDataSetChanged();
                 }
             }

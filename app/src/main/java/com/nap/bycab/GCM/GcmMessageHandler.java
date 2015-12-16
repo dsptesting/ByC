@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nap.bycab.R;
+import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.activity.SplashActivity;
 
 
@@ -64,7 +65,7 @@ public class GcmMessageHandler extends IntentService {
                 Log.i("", "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
                 sendNotification(extras);
-                Log.i("", "Received: " + extras.toString());
+                Log.e("Received message: ", "Received: " + extras.toString());
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -79,15 +80,19 @@ public class GcmMessageHandler extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, SplashActivity.class).putExtra("is_from_notification", true), 0);
+                new Intent(this, MainActivity.class).putExtra("is_current_ride", true), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setAutoCancel(true)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(response.getString("message_title").toString())
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
-                        .setContentText(response.getString("message").toString());
+//                        .setContentTitle(response.getString("message_title").toString())
+//                        .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
+//                        .setContentText(response.getString("message").toString());
+
+        .setContentTitle("title")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText("message"))
+                .setContentText("message");
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());

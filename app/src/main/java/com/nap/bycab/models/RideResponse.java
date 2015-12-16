@@ -8,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by nirav on 14/12/15.
  */
-public class UpcomingRideResponse {
+public class RideResponse {
     @SerializedName("Response")
     private String responseId;
     @SerializedName("ResponseMsg")
@@ -16,11 +16,11 @@ public class UpcomingRideResponse {
     @SerializedName("Orders")
     private ArrayList<Order> alUpcomingRides;
 
-    public UpcomingRideResponse() {
+    public RideResponse() {
         //EMPTY CONSTRUCTOR
     }
 
-    public UpcomingRideResponse(String responseId, String responseMessage, ArrayList<Order> alUpcomingRides) {
+    public RideResponse(String responseId, String responseMessage, ArrayList<Order> alUpcomingRides) {
         this.responseId = responseId;
         this.responseMessage = responseMessage;
         this.alUpcomingRides = alUpcomingRides;
