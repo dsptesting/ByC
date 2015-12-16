@@ -123,9 +123,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             }
         }.start();
 
-        if(isForCurrentRide){
+//        if(isForCurrentRide){
             callCurrentRideService();
-        }
+//        }
 
 
     }
@@ -145,29 +145,20 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();
-        new PostServiceCall(AppConstants.UPDATE_DRIVER_STATUS,object){
+        new PostServiceCall(AppConstants.CURRENT_RIDE_INFO,object){
 
             @Override
             public void response(String response) {
                 progressDialog.dismiss();
-                Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
-                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+                Log.e(AppConstants.DEBUG_TAG, "call current rides resp " + response);
+                RideResponse rideResponse=new GsonBuilder().create().fromJson(response,RideResponse.class);
 
-                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
-                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                if(rideResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(mDrawerLayout, rideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
-
                 } else {
-
-                    RideResponse mDriver = PrefUtils.getCurrentDriver(MainActivity.this);
-                    try {
-                        mDriver.setDriverStatus(object.getString("Status"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    PrefUtils.setCurrentDriver(mDriver, MainActivity.this);
-
+                    PrefUtils.setCurrentRideList(rideResponse, MainActivity.this);
                 }
             }
 
@@ -176,6 +167,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 progressDialog.dismiss();
             }
         }.call();
+
     }
 
     private void callDriverStatusService(boolean isChecked) {

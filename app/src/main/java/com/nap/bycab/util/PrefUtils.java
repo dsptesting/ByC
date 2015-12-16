@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.nap.bycab.models.Driver;
+import com.nap.bycab.models.RideResponse;
 
 public class PrefUtils {
 
@@ -27,8 +28,6 @@ public class PrefUtils {
         return currentDriver;
     }
 
-
-
 //    public static void setForm(GetAssignedForm1 currentDriver, Context ctx){
 //        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "form1_prefs", 0);
 //        complexPreferences.putObject("from1_value", currentDriver);
@@ -36,12 +35,27 @@ public class PrefUtils {
 //    }
 //
 //
-//
 //    public static GetAssignedForm1 getForm(Context ctx){
 //        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "form1_prefs", 0);
 //        GetAssignedForm1 currentDriver = complexPreferences.getObject("from1_value", GetAssignedForm1.class);
 //        return currentDriver;
 //    }
+
+    public static void setCurrentRideList(RideResponse currentDriver, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "current_ride_prefs", 0);
+        complexPreferences.putObject("current_ride_value", currentDriver);
+        complexPreferences.commit();
+    }
+
+
+
+    public static RideResponse getCurrentRideList(Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "current_ride_prefs", 0);
+        RideResponse currentDriver = complexPreferences.getObject("current_ride_value", RideResponse.class);
+        return currentDriver;
+    }
+
+
 
     public static void setNotificationId(String login, Context ctx){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
