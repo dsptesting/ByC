@@ -13,4 +13,5 @@
     <color name="drawer_header">#f4f4f7</color>
     <color name="divider">#e7e3e3</color>
     <color name="splash_toolbar">#85dec4</color>
+    <color name="error_red">#f0575b</color>
 </resources>

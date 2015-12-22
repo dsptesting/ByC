@@ -11,7 +11,6 @@
     <!-- Required to show current location -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -39,15 +38,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyChyhXn-FoaFTjZJxF-1n_B_zTo_Amk8_o" />
 
         <activity
             android:name=".activity.MainActivity"
-            android:screenOrientation="portrait">
-
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.SplashActivity"
@@ -76,17 +73,19 @@
 
         <service android:name=".GCM.GcmMessageHandler" />
 
-        <activity android:name=".activity.ProfileActivity"
+        <activity
+            android:name=".activity.ProfileActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden">
-
+            android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait" >
-
         </activity>
-
+        <activity
+            android:name=".activity.FairActivity"
+            android:label="@string/title_activity_fair" >
+        </activity>
     </application>
 
 </manifest>

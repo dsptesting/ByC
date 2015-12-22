@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:wheel="http://schemas.android.com/apk/res-auto"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="25dp"
+        >
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change password"
+            android:textColor="#7a7a7a"
+            android:textSize="21sp"
+            android:textStyle="bold" />
+
+        <com.pnikosis.materialishprogress.ProgressWheel
+            android:id="@+id/pageLoader"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            wheel:matProg_barColor="@color/primaryColor"
+            wheel:matProg_progressIndeterminate="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/tvOldPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/transparent"
+            android:hint="Old Password"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="#333"
+            android:inputType="textCapSentences"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/tvOldPass"
+            android:layout_marginRight="30dp"
+            android:layout_alignLeft="@+id/tvOldPass"
+            android:background="@color/primaryColor"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/tvNewPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/transparent"
+            android:hint="New Password"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="#333"
+            android:inputType="textCapSentences"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/tvNewPass"
+            android:layout_marginRight="30dp"
+            android:layout_alignLeft="@+id/tvNewPass"
+            android:background="@color/primaryColor"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/tvReNewPass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="20dp"
+            android:background="@android:color/transparent"
+            android:hint="Repeat New Password"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="#333"
+            android:inputType="textCapSentences"
+            android:textSize="20sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="25dp"
+            android:layout_below="@+id/tvReNewPass"
+            android:layout_marginRight="30dp"
+            android:layout_alignLeft="@+id/tvReNewPass"
+            android:background="@color/primaryColor"
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tvError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="Old password is not matched!"
+        android:layout_marginLeft="30dp"
+        android:textColor="@color/error_red"
+        android:textSize="17sp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp"
+        android:layout_marginTop="15dp">
+
+        <LinearLayout
+            android:id="@+id/llCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/llChange"
+            android:background="@drawable/ok_selector"
+            android:paddingBottom="10dp"
+            android:clickable="true"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:id="@+id/tvCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CANCEL"
+                android:textColor="@color/primaryColor"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="10dp"
+            android:paddingLeft="15dp"
+            android:clickable="true"
+            android:paddingRight="15dp"
+            android:paddingTop="10dp"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/ok_selector"
+            >
+
+            <TextView
+                android:id="@+id/tvChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CHANGE"
+                android:textColor="@color/primaryColor"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>
