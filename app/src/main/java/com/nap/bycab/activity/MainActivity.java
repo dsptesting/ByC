@@ -124,51 +124,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }.start();
 
 //        if(isForCurrentRide){
-            callCurrentRideService();
+//            callCurrentRideService();
 //        }
 
 
     }
 
-    private void callCurrentRideService() {
 
-        final JSONObject object=new JSONObject();
-        try {
-            object.put("Id",PrefUtils.getCurrentDriver(MainActivity.this).getDriverId()+"");
-
-            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        new PostServiceCall(AppConstants.CURRENT_RIDE_INFO,object){
-
-            @Override
-            public void response(String response) {
-                progressDialog.dismiss();
-                Log.e(AppConstants.DEBUG_TAG, "call current rides resp " + response);
-                RideResponse rideResponse=new GsonBuilder().create().fromJson(response,RideResponse.class);
-
-                if(rideResponse.getResponseId().equalsIgnoreCase("0")){
-                    Snackbar snackbar=Snackbar.make(mDrawerLayout, rideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
-                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-                    snackbar.show();
-                } else {
-                    PrefUtils.setCurrentRideList(rideResponse, MainActivity.this);
-                }
-            }
-
-            @Override
-            public void error(String error) {
-                progressDialog.dismiss();
-            }
-        }.call();
-
-    }
 
     private void callDriverStatusService(boolean isChecked) {
 
@@ -321,7 +283,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 fragmentManager = getFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 HomeFragment homeFragment = HomeFragment.newInstance("","");
-                fragmentTransaction.replace(R.id.main_container, homeFragment);
+
+                fragmentTransaction.replace(R.id.main_container, homeFragment,"home_fragment");
                 fragmentTransaction.commit();
                 break;
 
@@ -542,8 +505,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         double latitude = mCurrentLocation.getLatitude();
         double longitude = mCurrentLocation.getLongitude();
         try {
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 15);
-            HomeFragment.map.animateCamera(cameraUpdate);
+//            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 15);
+//            HomeFragment.map.animateCamera(cameraUpdate);
             HomeFragment.map.clear();
 
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
@@ -552,6 +515,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public Location getCurrentLocation(){
+        return  mCurrentLocation;
     }
 
     @Override
