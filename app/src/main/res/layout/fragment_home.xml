@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/rootLayout"
     android:layout_height="match_parent"
     tools:context="com.nap.bycab.fragment.HomeFragment">
 
@@ -51,44 +52,96 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/tvSOS"
-        android:layout_below="@+id/addressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+    <LinearLayout
         android:layout_marginTop="15dp"
         android:layout_marginRight="10dp"
-        card_view:cardCornerRadius="3dp"
-        card_view:cardElevation="2sp"
-        card_view:cardUseCompatPadding="true">
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.CardView
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/tvSOS"
+            android:layout_below="@+id/addressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+
+            card_view:cardCornerRadius="3dp"
+            card_view:cardElevation="2sp"
+            card_view:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:background="#f34336"
+                android:orientation="vertical"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="7dp"
+                    android:paddingRight="7dp"
+                    android:text="SOS"
+                    android:textColor="#fff"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:clickable="true"
-            android:background="#f34336"
-            android:orientation="vertical"
-            android:layout_centerHorizontal="true"
-            android:gravity="center"
-            android:padding="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:paddingLeft="7dp"
-                android:paddingRight="7dp"
-                android:text="SOS"
-                android:textColor="#fff"
-                android:textSize="16sp" />
 
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="15dp"
+
+            card_view:cardCornerRadius="3dp"
+            card_view:cardElevation="2sp"
+            card_view:cardUseCompatPadding="true">
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:background="#fff"
+                android:orientation="vertical"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                >
+
+                <ImageView
+                    android:id="@+id/imgGPS"
+                    android:padding="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_gps"
+
+                  />
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
+
+
 
     <android.support.v7.widget.CardView
-        android:id="@+id/cvCustomerCall"
+
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -100,6 +153,7 @@
         card_view:cardUseCompatPadding="true">
 
         <LinearLayout
+            android:id="@+id/lvCustomerCall"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -108,6 +162,7 @@
             android:padding="10dp">
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="7dp"
@@ -116,24 +171,42 @@
                 android:textColor="#fff"
                 android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tvCustomerName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="7dp"
-                android:layout_marginTop="3dp"
-                android:paddingRight="7dp"
-                android:text="Darji Palak Suresh"
-                android:textColor="#fff"
-                android:textSize="19sp" />
+            <LinearLayout
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvCustomerName"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="7dp"
+                    android:layout_marginTop="3dp"
+                    android:paddingRight="7dp"
+                    android:text="Mr. XYZ"
+                    android:textColor="#fff"
+                    android:textSize="19sp" />
+
+                <ImageView
+                    android:id="@+id/imgCall"
+                    android:src="@drawable/ic_call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+            </LinearLayout>
+
 
             <TextView
+                android:id="@+id/tvTimeLeft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="7dp"
                 android:paddingRight="7dp"
                 android:layout_marginTop="15dp"
-                android:text="Mobile Number"
+                android:text="120 sec left"
                 android:textColor="#fff"
                 android:textSize="14sp" />
 
@@ -144,9 +217,9 @@
                 android:paddingLeft="7dp"
                 android:paddingRight="7dp"
                 android:layout_marginTop="3dp"
-                android:text="9662519798"
+                android:text="305-Vinayak Gold Complex,Near kamlanagar talav,ajwa road,vadodara,390019."
                 android:textColor="#fff"
-                android:textSize="19sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvAccept"
