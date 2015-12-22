@@ -64,8 +64,8 @@ public class GcmMessageHandler extends IntentService {
                 }
                 Log.i("", "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-                sendNotification(extras);
                 Log.e("Received message: ", "Received: " + extras.toString());
+                sendNotification(extras);
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -84,17 +84,15 @@ public class GcmMessageHandler extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setAutoCancel(true)
+                        .setAutoCancel(false)
                         .setSmallIcon(R.mipmap.ic_launcher)
-//                        .setContentTitle(response.getString("message_title").toString())
-//                        .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
-//                        .setContentText(response.getString("message").toString());
+                        .setContentTitle(response.getString("message_title").toString())
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
+                        .setContentText(response.getString("message").toString())
+                        .addAction(0,"Accept",contentIntent)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText("message"));
 
-        .setContentTitle("title")
-                .setStyle(new NotificationCompat.BigTextStyle().bigText("message"))
-                .setContentText("message");
-
-        mBuilder.setContentIntent(contentIntent);
+        //mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 }
