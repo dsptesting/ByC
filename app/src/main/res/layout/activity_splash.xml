@@ -12,9 +12,10 @@
         android:layout_above="@+id/rlLogin">
 
         <ImageView
+
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/login_bg"
+            android:background="@drawable/login_bg"
             android:scaleType="centerCrop"/>
 
         <RelativeLayout
@@ -24,13 +25,15 @@
             android:layout_centerHorizontal="true">
 
             <ImageView
+
                 android:id="@+id/ivBike"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="@dimen/logo_size"
+                android:layout_height="@dimen/logo_size"
                 android:layout_centerHorizontal="true"
-                android:src="@drawable/bile" />
+                android:src="@drawable/app_logo" />
 
             <com.nap.bycab.custom.FarryRegTextView
+                android:visibility="gone"
                 android:id="@+id/tvTitle"
                 android:layout_below="@+id/ivBike"
                 android:layout_width="wrap_content"
@@ -45,11 +48,11 @@
                 android:layout_below="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:textColor="#efefef"
-                android:textSize="15sp"
+
+                android:textColor="@color/black"
+                android:textSize="@dimen/tagline_size"
                 android:layout_centerHorizontal="true"
-                android:text="Just call us wherever you are." />
+                android:text="Transforming Transit" />
 
         </RelativeLayout>
 
@@ -94,7 +97,7 @@
                     android:layout_marginStart="30dp"
                     android:layout_marginEnd="30dp"
                     android:text="LOGIN"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="@color/black"
                     android:textSize="18sp" />
 
             </LinearLayout>

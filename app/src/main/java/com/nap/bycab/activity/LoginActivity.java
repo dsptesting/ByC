@@ -87,8 +87,8 @@ public class LoginActivity extends BaseActivity {
         list.add("Select Service");
         list.add("Pickup/Dropoff");
         list.add("Delivery");
-        list.add("Driver");
-        list.add("Service");
+        list.add("Driver / Service");
+//        list.add("Service");
 
 
         spinner1 = (Spinner) findViewById(R.id.spinner1);
