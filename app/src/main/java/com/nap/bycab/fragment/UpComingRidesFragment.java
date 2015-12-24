@@ -211,6 +211,8 @@ public class UpComingRidesFragment extends Fragment {
                 viewHolder.tvDesValue = (TextView) convertView.findViewById(R.id.tvDesValue);
                 viewHolder.tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
                 viewHolder.tvKms = (TextView) convertView.findViewById(R.id.tvKms);
+                viewHolder.tvPlus2 = (TextView) convertView.findViewById(R.id.tvPlus2);
+                viewHolder.tvWaitTime = (TextView) convertView.findViewById(R.id.tvWaitTime);
 
                 convertView.setTag(viewHolder);
             }
@@ -222,9 +224,10 @@ public class UpComingRidesFragment extends Fragment {
             viewHolder.tvCustomerName.setText(""+ al.get(position).getCustName());
             viewHolder.tvSrcValue.setText(""+ al.get(position).getPickUpLocation());
             viewHolder.tvDesValue.setText(""+ al.get(position).getDropLocation());
-            viewHolder.tvPrice.setText(""+ al.get(position).getAmount());
+            viewHolder.tvPrice.setText("approx " + al.get(position).getAmount()+"\u20B9");
             viewHolder.tvKms.setText(""+ al.get(position).getKM()+" kms");
-
+            viewHolder.tvPlus2.setVisibility(View.GONE);
+            viewHolder.tvWaitTime.setVisibility(View.GONE);
             return convertView;
         }
 
@@ -239,6 +242,8 @@ public class UpComingRidesFragment extends Fragment {
             TextView tvDesValue;
             TextView tvKms;
             TextView tvPrice;
+            TextView tvPlus2;
+            TextView tvWaitTime;
         }
 
     }

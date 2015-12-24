@@ -221,16 +221,17 @@ public class MyRidesFragment extends Fragment {
             }
 
             viewHolder.rlActions.setVisibility(View.GONE);
-            viewHolder.tvSrcValue.setVisibility(View.GONE);
-            viewHolder.tvDesValue.setVisibility(View.GONE);
-            viewHolder.tvSrc.setVisibility(View.GONE);
-            viewHolder.tvDes.setVisibility(View.GONE);
+            viewHolder.tvSrcValue.setVisibility(View.VISIBLE);
+            viewHolder.tvDesValue.setVisibility(View.VISIBLE);
+            viewHolder.tvSrc.setVisibility(View.VISIBLE);
+            viewHolder.tvDes.setVisibility(View.VISIBLE);
 
             viewHolder.tvCustomerMobile.setText(""+ al.get(position).getCustMobile());
             viewHolder.tvCustomerName.setText(""+ al.get(position).getCustName());
-            viewHolder.tvPrice.setText("" + al.get(position).getAmount());
+            viewHolder.tvPrice.setText("Total " + al.get(position).getAmount()+"\u20B9");
             viewHolder.tvKms.setText(""+ al.get(position).getKM()+" kms");
-
+            viewHolder.tvSrcValue.setText(""+ al.get(position).getPickUpLocation());
+            viewHolder.tvDesValue.setText(""+ al.get(position).getDropLocation());
             return convertView;
         }
 
