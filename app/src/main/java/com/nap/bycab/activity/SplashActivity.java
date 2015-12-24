@@ -172,9 +172,9 @@ public class SplashActivity extends AppCompatActivity {
                             try {
                                 PrefUtils.setNotificationId(regid, SplashActivity.this);
                                 if (PrefUtils.getNotificationId(SplashActivity.this).length() > 7) {
-                                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                                    startActivity(i);
-                                    finish();
+//                                    Intent i = new Intent(SplashActivity.this, MainActivity.class);
+//                                    startActivity(i);
+//                                    finish();
                                 } else {
                                     checkGCMStatus();
                                 }
