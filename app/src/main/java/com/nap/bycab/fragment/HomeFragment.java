@@ -82,10 +82,6 @@ public class HomeFragment extends Fragment {
     private RelativeLayout rootLayout;
     private Order currentOrder;
 
-
-
-
-
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
