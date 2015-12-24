@@ -2,6 +2,7 @@ package com.nap.bycab.activity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -58,6 +59,7 @@ import com.google.android.gms.location.LocationServices;
 import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.LoginResponse;
+import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
@@ -91,10 +93,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         isInternetAvailable=isInternetAvailable();
 
-        isForCurrentRide=getIntent().getBooleanExtra("is_current_ride",false);
-
+        handleNotification(getIntent());
 
         driver=PrefUtils.getCurrentDriver(MainActivity.this);
 
@@ -130,7 +132,45 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
 
+        Log.v(AppConstants.DEBUG_TAG, "onNewIntent");
+
+        handleNotification(intent);
+    }
+
+    private void handleNotification(Intent intent){
+
+        isForCurrentRide = intent.getBooleanExtra("IsCurrentRide", false);
+
+        Log.v(AppConstants.DEBUG_TAG, "Noti Id: " + intent.getIntExtra("notification_id", 0));
+
+        if(isForCurrentRide){
+
+            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+            for(int i = 0;i<notificationList.getIdList().size();i++){
+                notificationManager.cancel(notificationList.getIdList().get(i));
+            }
+            PrefUtils.clearCurrentNotificationIdList(this);
+        }
+        else{
+
+            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+            for(int i = 0;i<notificationList.getIdList().size();i++){
+                notificationManager.cancel(notificationList.getIdList().get(i));
+            }
+            PrefUtils.clearUpcomingNotificationIdList(this);
+        }
+
+        /*if(intent.getIntExtra("notification_id", 0) != 0){
+
+            notificationManager.cancel(intent.getIntExtra("notification_id", 0));
+        }*/
+    }
 
     private void callDriverStatusService(boolean isChecked) {
 

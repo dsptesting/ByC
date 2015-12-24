@@ -185,6 +185,10 @@ public class ProfileActivity extends BaseActivity {
                 object.put("Name", ((EditText)findViewById(R.id.tvNameVal)).getText().toString() + "");
                 object.put("VehicalDesc", ((EditText)findViewById(R.id.tvVehicleDesVal)).getText().toString() + "");
                 object.put("Id", PrefUtils.getCurrentDriver(ProfileActivity.this).getDriverId() + "");
+                object.put("DriverStatus", PrefUtils.getCurrentDriver(ProfileActivity.this).getDriverStatus() + "");
+                object.put("GCMID", PrefUtils.getCurrentDriver(ProfileActivity.this).getNotificationId() + "");
+                object.put("EmailId", PrefUtils.getCurrentDriver(ProfileActivity.this).getEmailId() + "");
+                object.put("Password", PrefUtils.getCurrentDriver(ProfileActivity.this).getPassword() + "");
                 Log.e(AppConstants.DEBUG_TAG, "callUpdateProfileService request: " + object.toString());
             }
             catch (JSONException e) {
@@ -209,7 +213,11 @@ public class ProfileActivity extends BaseActivity {
 
                     }
                     else {
-                        // PrefUtils.setCurrentDriver(loginResponse.getDriver(),getActivity());
+
+                        Snackbar snackbar = Snackbar.make(llProfile, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                        snackbar.show();
+                        // PrefUtils.setCurrentDriver(logi`nResponse.getDriver(),getActivity());
 
                         /*alUpcomingRides.clear();
                         alUpcomingRides.addAll(upcomingRideResponse.getAlUpcomingRides());

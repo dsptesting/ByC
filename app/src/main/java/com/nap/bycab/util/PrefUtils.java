@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.nap.bycab.models.Driver;
+import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.models.RideResponse;
 
 public class PrefUtils {
@@ -68,5 +69,41 @@ public class PrefUtils {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         return preferences.getString("notification", "");
 
+    }
+
+    public static void setUpcomingNotificationIdList(NotificationList notificationList, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "upcoming_notificationList_prefs", 0);
+        complexPreferences.putObject("UpcomingNotificationIdList", notificationList);
+        complexPreferences.commit();
+    }
+
+    public static void clearUpcomingNotificationIdList( Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "upcoming_notificationList_prefs", 0);
+        complexPreferences.clearObject();
+        complexPreferences.commit();
+    }
+
+    public static NotificationList getUpcomingNotificationIdList(Context ctx) {
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "upcoming_notificationList_prefs", 0);
+        NotificationList notificationList = complexPreferences.getObject("UpcomingNotificationIdList", NotificationList.class);
+        return notificationList;
+    }
+
+    public static void setCurrentNotificationIdList(NotificationList notificationList, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "current_notificationList_prefs", 0);
+        complexPreferences.putObject("CurrentNotificationIdList", notificationList);
+        complexPreferences.commit();
+    }
+
+    public static void clearCurrentNotificationIdList( Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "current_notificationList_prefs", 0);
+        complexPreferences.clearObject();
+        complexPreferences.commit();
+    }
+
+    public static NotificationList getCurrentNotificationIdList(Context ctx) {
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "current_notificationList_prefs", 0);
+        NotificationList notificationList = complexPreferences.getObject("CurrentNotificationIdList", NotificationList.class);
+        return notificationList;
     }
 }

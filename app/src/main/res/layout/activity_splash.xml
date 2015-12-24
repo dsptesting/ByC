@@ -38,7 +38,7 @@
                 android:textColor="#fff"
                 android:layout_centerHorizontal="true"
                 android:textSize="40sp"
-                android:text="ByCab" />
+                android:text="ByKab" />
 
             <!--78a395-->
             <com.nap.bycab.custom.NormalTextView

@@ -19,6 +19,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nap.bycab.R;
+import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.util.PrefUtils;
 
 import java.io.IOException;
@@ -85,6 +86,10 @@ public class SplashActivity extends AppCompatActivity {
 
             }
         });
+
+        // TODO is this right init place for this
+        PrefUtils.setUpcomingNotificationIdList(new NotificationList(), this);
+        PrefUtils.setCurrentNotificationIdList(new NotificationList(), this);
     }
 
     public void checkGCMStatus() {
@@ -107,7 +112,8 @@ public class SplashActivity extends AppCompatActivity {
                     coomonAlertDialog("No Internet...", "Please Check your Internet Connection and Try Again",false);
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             if (isInternetAvailable()) {
                 getRegId();

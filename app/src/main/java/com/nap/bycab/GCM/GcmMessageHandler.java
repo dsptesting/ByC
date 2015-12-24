@@ -5,6 +5,7 @@ package com.nap.bycab.GCM;
  */
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -18,10 +19,15 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.activity.SplashActivity;
+import com.nap.bycab.models.NotificationList;
+import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.PrefUtils;
+
+import java.util.Random;
 
 
 public class GcmMessageHandler extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
+
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     //974763131360
@@ -54,7 +60,7 @@ public class GcmMessageHandler extends IntentService {
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // This loop represents the service doing some work.
-                for (int i=0; i<5; i++) {
+                /*for (int i=0; i<5; i++) {
                     Log.i("", "Working... " + (i + 1)
                             + "/5 @ " + SystemClock.elapsedRealtime());
                     try {
@@ -62,7 +68,7 @@ public class GcmMessageHandler extends IntentService {
                     } catch (InterruptedException e) {
                     }
                 }
-                Log.i("", "Completed work @ " + SystemClock.elapsedRealtime());
+                Log.i("", "Completed work @ " + SystemClock.elapsedRealtime());*/
                 // Post notification of received message.
                 Log.e("Received message: ", "Received: " + extras.toString());
                 sendNotification(extras);
@@ -76,23 +82,56 @@ public class GcmMessageHandler extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
     private void sendNotification(Bundle response) {
-        mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class).putExtra("is_current_ride", true), 0);
+        mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setAutoCancel(false)
+        if(response==null){
+            return;
+        }
+
+        Random random = new Random();
+        int m = random.nextInt(9999 - 1000) + 1000;
+
+        if(!Boolean.parseBoolean(response.getString("IsOrderCompleted"))){
+
+            // Order completed... handler it.
+            Log.v(AppConstants.DEBUG_TAG, "Order completed Noti Id: " + m);
+        }
+        else if(!Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+
+            // upcoming ride..
+            Log.v(AppConstants.DEBUG_TAG, "upcoming ride Noti Id: " + m);
+
+            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(GcmMessageHandler.this);
+            notificationList.getIdList().add(new Integer(m));
+            PrefUtils.setUpcomingNotificationIdList(notificationList,GcmMessageHandler.this);
+        }
+        else if(Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+
+            // current ride...
+            Log.v(AppConstants.DEBUG_TAG, "current ride Noti Id: " + m);
+
+            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(GcmMessageHandler.this);
+            notificationList.getIdList().add(new Integer(m));
+            PrefUtils.setCurrentNotificationIdList(notificationList, GcmMessageHandler.this);
+        }
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
+        intent.putExtra("is_current_ride", true);
+        intent.putExtra("notification_id", m);
+        intent.setAction(""+m);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GcmMessageHandler.this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(response.getString("message_title").toString())
+                        .setContentTitle(response.getString("contentTitle").toString())
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
                         .setContentText(response.getString("message").toString())
-                        .addAction(0,"Accept",contentIntent)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText("message"));
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setOngoing(true);
 
-        //mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        mBuilder.setContentIntent(contentIntent);
+
+        mNotificationManager.notify(m, mBuilder.build());
     }
 }

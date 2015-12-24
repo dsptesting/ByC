@@ -99,11 +99,6 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-
-
-
-
-
                 tvMob= (EditText) findViewById(R.id.tvMob);
                 tvPass= (EditText) findViewById(R.id.tvPass);
                 mRootLayout= (RelativeLayout) findViewById(R.id.mRootLayout);
@@ -177,10 +172,7 @@ public class LoginActivity extends BaseActivity {
                 progressDialog.dismiss();
             }
         }.call();
-
-
     }
-
 
     public class CustomSpinnerAdapter extends BaseAdapter implements SpinnerAdapter {
 
@@ -218,9 +210,6 @@ public class LoginActivity extends BaseActivity {
             txt.setText(asr.get(position));
             txt.setTextColor(Color.parseColor("#000000"));
             return  txt;
-
-
-
         }
 
         public View getView(int i, View view, ViewGroup viewgroup) {
