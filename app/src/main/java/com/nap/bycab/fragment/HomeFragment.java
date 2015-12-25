@@ -15,6 +15,8 @@ import android.app.Fragment;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.DisplayMetrics;
@@ -53,6 +55,7 @@ import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.BottomViewPager;
 import com.nap.bycab.util.MapStateListener;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
@@ -67,6 +70,7 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private BottomViewPager pager=null;
     private String mParam1;
     private String mParam2;
     private MapView mapView;
@@ -106,8 +110,7 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
@@ -126,7 +129,8 @@ public class HomeFragment extends Fragment {
                 callCurrentRideService();
             }
         }.start();
-        tvAccept.setOnClickListener(new View.OnClickListener() {
+
+        /*tvAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isAccepted){
@@ -166,7 +170,7 @@ public class HomeFragment extends Fragment {
                 callIntent.setData(Uri.parse("tel:9033701373"));
                 startActivity(callIntent);
             }
-        });
+        });*/
 
 
         tvGPS.setOnClickListener(new View.OnClickListener() {
@@ -295,7 +299,7 @@ public class HomeFragment extends Fragment {
                     Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
-                    tvAccept.setText("Stop");
+                   // tvAccept.setText("Stop");
 
                 }
             }
@@ -340,7 +344,7 @@ public class HomeFragment extends Fragment {
                     Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
-                    tvAccept.setText("Start");
+                    //tvAccept.setText("Start");
 
                 }
             }
@@ -362,6 +366,17 @@ public class HomeFragment extends Fragment {
                 ((MainActivity) getActivity()).openCloseDrawer();
             }
         });
+
+
+        pager=(BottomViewPager)view.findViewById(R.id.pager);
+        pager.setAdapter(new SampleAdapter(getActivity()));
+        pager.setOffscreenPageLimit(3);
+        int margin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30*2,     getResources().getDisplayMetrics());
+        pager.setPageMargin(-margin);
+        pager.setPadding(30, 0, 30, 0);
+        pager.setClipToPadding(false);
+       // pager.setPageMargin(50);
+
     }
 
     /**
@@ -386,9 +401,66 @@ public class HomeFragment extends Fragment {
         MapsInitializer.initialize(this.getActivity());
          //This goes up to 21
         LatLng latLng=new LatLng(map.getMyLocation().getLatitude(),map.getMyLocation().getLongitude());
+    }
 
+    /*
+   * Inspired by
+   * https://gist.github.com/8cbe094bb7a783e37ad1
+   */
+    private class SampleAdapter extends PagerAdapter {
 
+        Context context;
+        LayoutInflater inflater;
 
+        SampleAdapter(Context context){
+
+            this.context = context;
+            inflater =  LayoutInflater.from(context);
+
+        }
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
+            /*TextView tv=(TextView)page.findViewById(R.id.text);
+            int blue=position * 25;
+
+            final String msg= String.format(getString(R.string.item), position + 1);
+
+            tv.setText(msg);
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+
+            page.setBackgroundColor(Color.argb(255, 0, 0, blue));*/
+            container.addView(page);
+
+            return(page);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position,
+                                Object object) {
+            container.removeView((View)object);
+        }
+
+        @Override
+        public int getCount() {
+            return(3);
+        }
+
+        /*@Override
+        public float getPageWidth(int position) {
+            return(1f);
+        }
+*/
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return(view == object);
+        }
     }
 
     @Override

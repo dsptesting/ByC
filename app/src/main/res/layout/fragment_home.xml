@@ -133,10 +133,10 @@
     </LinearLayout>
 
 
-    <android.support.v4.view.ViewPager
+    <com.nap.bycab.util.BottomViewPager
         android:id="@+id/pager"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
         android:layout_height="wrap_content"/>
 
 
