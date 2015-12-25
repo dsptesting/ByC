@@ -384,8 +384,6 @@ public class HomeFragment extends Fragment {
      * */
     private void initilizeMap(Bundle savedInstanceState) {
 
-
-
         mapView = (MapView) view.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
 
