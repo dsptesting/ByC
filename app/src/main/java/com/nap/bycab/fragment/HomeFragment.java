@@ -88,6 +88,7 @@ public class HomeFragment extends Fragment {
     private RideResponse rideResponse;
     private RelativeLayout rootLayout;
     private Order currentOrder;
+    private TextView tvStartStop;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -118,7 +119,31 @@ public class HomeFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
         tvTimeLeft= (TextView) view.findViewById(R.id.tvTimeLeft);
-        tvAccept= (TextView) view.findViewById(R.id.tvAccept);
+        tvStartStop= (TextView) view.findViewById(R.id.tvStartStop);
+        tvStartStop.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                if(isStarted){
+                    //stop button operation
+                    //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
+                    tvStartStop.setText("DONE");
+
+                }
+                else
+                {
+                    isStarted=true;
+                    //start button operation
+                    //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
+                    //callStartService();
+                    tvStartStop.setText("STOP");
+
+                    ((MainActivity)getActivity()).myService.createNotification();
+                }
+            }
+        });
+
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
 
@@ -133,28 +158,7 @@ public class HomeFragment extends Fragment {
             }
         }.start();
 
-        /*tvAccept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(isAccepted){
-                    if(isStarted){
-                        //stop button operation
-                      //  callStopService();
-                        tvAccept.setText("Done");
-                    } else {
-                        isStarted=true;
-                        //start button operation
-//                        callStartService();
-                        tvAccept.setText("Stop");
-                    }
-                } else {
-                    isAccepted=true;
-                    //accept button operation
-//                    callAcceptService();
-                    tvAccept.setText("Start");
-                }
-            }
-        });
+        /*
         new CountDownTimer(120000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -207,8 +211,6 @@ public class HomeFragment extends Fragment {
         if (!isGooglePlayServicesAvailable()) {
             getActivity().finish();
         }
-
-
 
         initUi();
 
@@ -267,19 +269,14 @@ public class HomeFragment extends Fragment {
 
     }
 
-    private void callStopService() {
+    private void updateOrderService(int statusCode) {
 
-    }
-
-   
-
-    private void callStartService() {
         final JSONObject object=new JSONObject();
         try {
             object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
             object.put("OrderId",""+currentOrder.getOrderId());
-            object.put("Status","Start");
-            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
+            object.put("Status",statusCode);
+            Log.e(AppConstants.DEBUG_TAG, "updateOrderService " + object);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -317,7 +314,7 @@ public class HomeFragment extends Fragment {
         }.call();
     }
 
-    private void callAcceptService() {
+    /*private void callAcceptService() {
 
         final JSONObject object=new JSONObject();
         try {
@@ -360,7 +357,7 @@ public class HomeFragment extends Fragment {
                 progressDialog.dismiss();
             }
         }.call();
-    }
+    }*/
 
 
     private void initUi() {
@@ -446,7 +443,8 @@ public class HomeFragment extends Fragment {
             animUp = AnimationUtils.loadAnimation(context, R.anim.slideup);
             animUp.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animation animation) { }
+                public void onAnimationStart(Animation animation) {
+                }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -455,7 +453,8 @@ public class HomeFragment extends Fragment {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) { }
+                public void onAnimationRepeat(Animation animation) {
+                }
             });
         }
         @Override
@@ -463,12 +462,44 @@ public class HomeFragment extends Fragment {
 
             final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
 
-            TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
+            final TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
             tvAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     pager.startAnimation(animDown);
+
+                    /*if(isAccepted){
+
+                        if(isStarted){
+                            //stop button operation
+                            //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
+                            tvAccept.setText("DONE");
+                        }
+                        else {
+                            isStarted=true;
+                            //start button operation
+                            //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
+                            //callStartService();
+                            tvAccept.setText("STOP");
+                        }
+                    }
+                    else {
+                        isAccepted=true;
+                        //accept button operation
+                        //callAcceptService();
+                        //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
+                        tvAccept.setText("START");
+                    }*/
+
+                    if(!isAccepted){
+
+                        isAccepted=true;
+                        //accept button operation
+                        //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
+                        tvAccept.setText("START");
+                    }
+
                 }
             });
 

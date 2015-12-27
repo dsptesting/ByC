@@ -27,7 +27,7 @@ android {
             signingConfig signingConfigs.config
         }
         debug {
-            debuggable false
+            debuggable true
             signingConfig signingConfigs.config
         }
     }

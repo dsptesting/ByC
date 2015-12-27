@@ -4,13 +4,16 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -62,6 +65,7 @@ import com.nap.bycab.models.LoginResponse;
 import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
+import com.nap.bycab.util.LocationBackgroundService;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
 
@@ -76,6 +80,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ActionBarDrawerToggle drawerToggle;
     private int mSelectedId;
     private TextView tvEditProfile;
+    private boolean isNotificationLocation;
     private Driver driver;
     private SwitchCompat switchDriverStatus;
     private boolean isForCurrentRide;
@@ -88,7 +93,22 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
     protected Boolean mRequestingLocationUpdates;
+    private Intent serviceIntent;
+    public LocationBackgroundService myService;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("ServiceConnection","connected");
+            LocationBackgroundService.MyBinder b = (LocationBackgroundService.MyBinder) service;
+            myService = b.getService();
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d("ServiceConnection","disconnected");
+            myService = null;
+        }
+    };;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,16 +122,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         setNavigationDrawer(savedInstanceState);
 
-        //location update
+        LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+            buildAlertMessageNoGps();
+        }
+
+        /*//location update
         mRequestingLocationUpdates = false;
 
         buildGoogleApiClient();
         mGoogleApiClient.connect();
 
-        LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-            buildAlertMessageNoGps();
-        }
 
         new CountDownTimer(2000, 1000) {
 
@@ -123,13 +144,34 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 if(mGoogleApiClient.isConnected()) startUpdatesButtonHandler();
 
             }
-        }.start();
+        }.start();*/
 
 //        if(isForCurrentRide){
 //            callCurrentRideService();
 //        }
 
 
+
+        serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
+        //startService(serviceIntent);
+
+        // To call onServiceConnected() if the service already started
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+
+
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //stopService(serviceIntent);
+        super.onDestroy();
+        unbindService(serviceConnection);
     }
 
     @Override
@@ -143,28 +185,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void handleNotification(Intent intent){
 
+        isNotificationLocation = intent.getBooleanExtra("isNotificationLocation", false);
         isForCurrentRide = intent.getBooleanExtra("IsCurrentRide", false);
 
         Log.v(AppConstants.DEBUG_TAG, "Noti Id: " + intent.getIntExtra("notification_id", 0));
 
-        if(isForCurrentRide){
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
-            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
-            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-            for(int i = 0;i<notificationList.getIdList().size();i++){
-                notificationManager.cancel(notificationList.getIdList().get(i));
-            }
-            PrefUtils.clearCurrentNotificationIdList(this);
+        if(isNotificationLocation){
+
+            // handle direct implementation of current ride popup
+            notificationManager.cancelAll();
+
+
         }
         else{
+            if(isForCurrentRide){
 
-            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
-            NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-            for(int i = 0;i<notificationList.getIdList().size();i++){
-                notificationManager.cancel(notificationList.getIdList().get(i));
+                NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+                for(int i = 0;i<notificationList.getIdList().size();i++){
+                    notificationManager.cancel(notificationList.getIdList().get(i));
+                }
+                PrefUtils.clearCurrentNotificationIdList(this);
             }
-            PrefUtils.clearUpcomingNotificationIdList(this);
+            else{
+
+                NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+                for(int i = 0;i<notificationList.getIdList().size();i++){
+                    notificationManager.cancel(notificationList.getIdList().get(i));
+                }
+                PrefUtils.clearUpcomingNotificationIdList(this);
+            }
         }
+
 
         /*if(intent.getIntExtra("notification_id", 0) != 0){
 
@@ -424,7 +477,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
     //Location Update Code
-
     protected synchronized void buildGoogleApiClient() {
         Log.i(TAG, "Building GoogleApiClient");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -460,8 +512,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
     protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
     protected void stopLocationUpdates() {
@@ -469,37 +520,27 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-
-
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+        /*if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
-        }
-
-
-
-
+        }*/
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
+        /*if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
-        }
+        }*/
+
     }
+
+
 
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
-
+       // mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -564,7 +605,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onConnectionSuspended(int cause) {
         Log.i(TAG, "Connection suspended");
-        mGoogleApiClient.connect();
+        if(mGoogleApiClient != null) mGoogleApiClient.connect();
     }
 
     @Override
@@ -577,9 +618,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         JSONObject object=new JSONObject();
         try {
-
-
-
             object.put("Id", driver.getDriverId()+"");
             object.put("Latitude",mCurrentLocation.getLatitude()+"");
             object.put("Longitude",mCurrentLocation.getLongitude()+"");

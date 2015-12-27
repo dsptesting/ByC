@@ -87,6 +87,14 @@
             android:name=".activity.FairActivity"
             android:label="@string/title_activity_fair" >
         </activity>
+
+        <service
+            android:name=".util.LocationBackgroundService"
+            android:enabled="true"
+            android:exported="true" >
+
+        </service>
+
     </application>
 
 </manifest>

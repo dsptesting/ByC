@@ -119,6 +119,7 @@ public class GcmMessageHandler extends IntentService {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
         intent.putExtra("is_current_ride", true);
+        intent.putExtra("isNotificationLocation", false);
         intent.putExtra("notification_id", m);
         intent.setAction(""+m);
         PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);

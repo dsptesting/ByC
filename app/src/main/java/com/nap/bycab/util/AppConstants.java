@@ -31,4 +31,10 @@ public class AppConstants {
 
     public static final String CHANGE_PASS=DOMAIN_NAME+"ByKabService/User.svc/json/ChangePassword";
 
+    public static final int ORDER_STATUS_PENDING = 0;
+    public static final int ORDER_STATUS_DRIVING = 1;
+    public static final int ORDER_STATUS_COMPLETE = 2;
+    public static final int ORDER_STATUS_CANCEL = 3;
+    public static final int ORDER_STATUS_ACCEPT = 4;
+
 }
