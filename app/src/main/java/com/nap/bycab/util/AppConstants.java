@@ -29,4 +29,6 @@ public class AppConstants {
 
     public static final String UPDATE_PROFILE=DOMAIN_NAME+"ByKabService/User.svc/json/UpdateProfile";
 
+    public static final String CHANGE_PASS=DOMAIN_NAME+"ByKabService/User.svc/json/ChangePassword";
+
 }

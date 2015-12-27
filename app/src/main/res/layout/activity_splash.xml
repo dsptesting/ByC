@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:textColor="@color/black"
+                android:textColor="#fff"
                 android:textSize="@dimen/tagline_size"
                 android:layout_centerHorizontal="true"
                 android:text="Transforming Transit" />
@@ -62,7 +62,7 @@
         android:id="@+id/rlLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dark_gray"
+        android:background="#2282cc"
         android:layout_alignParentBottom="true">
 
         <android.support.v7.widget.CardView
@@ -97,7 +97,7 @@
                     android:layout_marginStart="30dp"
                     android:layout_marginEnd="30dp"
                     android:text="LOGIN"
-                    android:textColor="@color/dark_gray"
+                    android:textColor="@color/primaryColor"
                     android:textSize="18sp" />
 
             </LinearLayout>

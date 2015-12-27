@@ -72,7 +72,7 @@
                     android:textColor="#333"
                     android:textSize="15sp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/tvAccountPassVal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

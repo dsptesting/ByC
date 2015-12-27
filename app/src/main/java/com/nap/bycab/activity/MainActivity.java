@@ -184,14 +184,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             e.printStackTrace();
         }
 
-        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
+        /*final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Loading...");
-        progressDialog.show();
+        progressDialog.show();*/
         new PostServiceCall(AppConstants.UPDATE_DRIVER_STATUS,object){
 
             @Override
             public void response(String response) {
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
                 Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
                 CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
 
@@ -215,7 +215,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             @Override
             public void error(String error) {
-                progressDialog.dismiss();
+               // progressDialog.dismiss();
             }
         }.call();
     }

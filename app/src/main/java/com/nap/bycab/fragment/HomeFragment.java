@@ -26,6 +26,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -71,6 +73,7 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private BottomViewPager pager=null;
+    private CardView cvCurrentRideDetails;
     private String mParam1;
     private String mParam2;
     private MapView mapView;
@@ -178,19 +181,22 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 Log.e("gps...","clicked");
                 Location mCurrentLocation = ((MainActivity) getActivity()).getCurrentLocation();
-                double latitude = mCurrentLocation.getLatitude();
-                double longitude = mCurrentLocation.getLongitude();
-                try {
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15);
-                    HomeFragment.map.animateCamera(cameraUpdate);
-                    HomeFragment.map.clear();
+                if(mCurrentLocation != null){
+                    double latitude = mCurrentLocation.getLatitude();
+                    double longitude = mCurrentLocation.getLongitude();
+                    try {
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15);
+                        HomeFragment.map.animateCamera(cameraUpdate);
+                        HomeFragment.map.clear();
 
-                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-                    Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                        HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
+                        Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+
             }
         });
 
@@ -228,14 +234,14 @@ public class HomeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        /*final ProgressDialog progressDialog=new ProgressDialog(getActivity());
         progressDialog.setMessage("Loading...");
-        progressDialog.show();
+        progressDialog.show();*/
         new PostServiceCall(AppConstants.CURRENT_RIDE_INFO,object){
 
             @Override
             public void response(String response) {
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
                 Log.e(AppConstants.DEBUG_TAG, "call current rides resp " + response);
                 RideResponse rideResponse=new GsonBuilder().create().fromJson(response,RideResponse.class);
 
@@ -255,7 +261,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void error(String error) {
-                progressDialog.dismiss();
+               // progressDialog.dismiss();
             }
         }.call();
 
@@ -368,6 +374,7 @@ public class HomeFragment extends Fragment {
         });
 
 
+        cvCurrentRideDetails = (CardView) view.findViewById(R.id.cvCurrentRideDetails);
         pager=(BottomViewPager)view.findViewById(R.id.pager);
         pager.setAdapter(new SampleAdapter(getActivity()));
         pager.setOffscreenPageLimit(3);
@@ -375,7 +382,8 @@ public class HomeFragment extends Fragment {
         pager.setPageMargin(-margin);
         pager.setPadding(30, 0, 30, 0);
         pager.setClipToPadding(false);
-       // pager.setPageMargin(50);
+
+
 
     }
 
@@ -405,35 +413,65 @@ public class HomeFragment extends Fragment {
    * Inspired by
    * https://gist.github.com/8cbe094bb7a783e37ad1
    */
-    private class SampleAdapter extends PagerAdapter {
+    private class SampleAdapter extends PagerAdapter{
 
         Context context;
         LayoutInflater inflater;
+        Animation animDown;
+        Animation animUp;
+        boolean isUpEnded;
 
         SampleAdapter(Context context){
 
             this.context = context;
             inflater =  LayoutInflater.from(context);
+            animDown = AnimationUtils.loadAnimation(context,R.anim.slidedown);
+            animDown.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) { }
 
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    animDown.cancel();
+                    pager.setAnimation(null);
+                    pager.setVisibility(View.GONE);
+                    cvCurrentRideDetails.setVisibility(View.VISIBLE);
+                    cvCurrentRideDetails.startAnimation(animUp);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { }
+            });
+
+            animUp = AnimationUtils.loadAnimation(context, R.anim.slideup);
+            animUp.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) { }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    animUp.cancel();
+                    cvCurrentRideDetails.setAnimation(null);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) { }
+            });
         }
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
-            /*TextView tv=(TextView)page.findViewById(R.id.text);
-            int blue=position * 25;
 
-            final String msg= String.format(getString(R.string.item), position + 1);
+            final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
 
-            tv.setText(msg);
-            tv.setOnClickListener(new View.OnClickListener() {
+            TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
+            tvAccept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG)
-                            .show();
+
+                    pager.startAnimation(animDown);
                 }
             });
 
-            page.setBackgroundColor(Color.argb(255, 0, 0, blue));*/
             container.addView(page);
 
             return(page);
@@ -442,7 +480,7 @@ public class HomeFragment extends Fragment {
         @Override
         public void destroyItem(ViewGroup container, int position,
                                 Object object) {
-            container.removeView((View)object);
+            container.removeView((View) object);
         }
 
         @Override

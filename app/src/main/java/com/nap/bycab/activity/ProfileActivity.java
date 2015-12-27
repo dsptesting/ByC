@@ -110,6 +110,10 @@ public class ProfileActivity extends BaseActivity {
                         inputManager.hideSoftInputFromWindow(tvReNewPass.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
 
+                    cancelThisDialog();
+
+                    callChangePassService(dialogView);
+
 
                 }
             }
@@ -117,6 +121,59 @@ public class ProfileActivity extends BaseActivity {
 
         alertDialog = builder.create();
         alertDialog.show();
+
+    }
+
+    private void callChangePassService(View dialogView) {
+
+
+            JSONObject object = new JSONObject();
+            try {
+                object.put("DriverId", PrefUtils.getCurrentDriver(this).getDriverId().toString() + "");
+                object.put("NewPass", ((EditText)dialogView.findViewById(R.id.tvNewPass)).getText().toString() + "");
+                object.put("OldPass", ((EditText)dialogView.findViewById(R.id.tvOldPass)).getText().toString() + "");
+                Log.e(AppConstants.DEBUG_TAG, "callChangePassService request: " + object.toString());
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            final ProgressDialog progressDialog = new ProgressDialog(ProfileActivity.this);
+            progressDialog.setMessage("Loading...");
+            progressDialog.show();
+            new PostServiceCall(AppConstants.CHANGE_PASS, object) {
+
+                @Override
+                public void response(String response) {
+                    progressDialog.dismiss();
+                    Log.e(AppConstants.DEBUG_TAG, "callChangePassService Response: " + response);
+                    CommonResponse commonResponse = new GsonBuilder().create().fromJson(response, CommonResponse.class);
+
+                    if (commonResponse.getResponseId().equalsIgnoreCase("0")) {
+                        Snackbar snackbar = Snackbar.make(llProfile, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                        snackbar.show();
+
+                    }
+                    else {
+
+                        Snackbar snackbar = Snackbar.make(llProfile, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                        snackbar.show();
+                        // PrefUtils.setCurrentDriver(logi`nResponse.getDriver(),getActivity());
+
+                        /*alUpcomingRides.clear();
+                        alUpcomingRides.addAll(upcomingRideResponse.getAlUpcomingRides());
+                        myAdapter.notifyDataSetChanged();*/
+                    }
+                }
+
+                @Override
+                public void error(String error) {
+                    progressDialog.dismiss();
+                }
+            }.call();
+
 
     }
 
@@ -128,12 +185,12 @@ public class ProfileActivity extends BaseActivity {
             ((TextView)dialogView.findViewById(R.id.tvError)).setText("Old password is blank!");
             return false;
         }
-
+/*
         if(!tvOldPass.getText().toString().equalsIgnoreCase(""+PrefUtils.getCurrentDriver(ProfileActivity.this).getPassword())){
             dialogView.findViewById(R.id.tvError).setVisibility(View.VISIBLE);
             ((TextView)dialogView.findViewById(R.id.tvError)).setText("Old password is not matched!");
             return false;
-        }
+        }*/
 
         EditText tvNewPass = (EditText) dialogView.findViewById(R.id.tvNewPass);
         if(tvNewPass.getText().toString().trim().length() == 0){
@@ -236,26 +293,59 @@ public class ProfileActivity extends BaseActivity {
 
     private boolean validateProfileInputs() {
 
+        EditText tvNameVal = (EditText) findViewById(R.id.tvNameVal);
+        if(tvNameVal.getText().toString().trim().length() == 0){
+            Snackbar snackbar = Snackbar.make(llProfile, "Name is blank!", Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+            snackbar.show();
+            return false;
+        }
 
+        EditText tvMobileVal = (EditText) findViewById(R.id.tvMobileVal);
+        if(tvMobileVal.getText().toString().trim().length() == 0){
+            Snackbar snackbar = Snackbar.make(llProfile, "Mobile Number is blank!", Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+            snackbar.show();
+            return false;
+        }
+
+        EditText tvDriverLicNoVal = (EditText) findViewById(R.id.tvDriverLicNoVal);
+        if(tvDriverLicNoVal.getText().toString().trim().length() == 0){
+            Snackbar snackbar = Snackbar.make(llProfile, "Driver Licence Number is blank!", Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+            snackbar.show();
+            return false;
+        }
+
+        EditText tvAdharNoVal = (EditText) findViewById(R.id.tvAdharNoVal);
+        if(tvAdharNoVal.getText().toString().trim().length() == 0){
+            Snackbar snackbar = Snackbar.make(llProfile, "Adhar Number is blank!", Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+            snackbar.show();
+            return false;
+        }
+
+        EditText tvVehicleDesVal = (EditText) findViewById(R.id.tvVehicleDesVal);
+        if(tvVehicleDesVal.getText().toString().trim().length() == 0){
+            Snackbar snackbar = Snackbar.make(llProfile, "Vehicle Description is blank!", Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+            snackbar.show();
+            return false;
+        }
 
         return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
 
             callUpdateProfileService();
