@@ -30,6 +30,9 @@ import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.fragment.HomeFragment;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+
 /**
  * Created by Palak on 27-12-2015.
  */
@@ -39,6 +42,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     private DistanceCalculator distanceCalculator;
     private double distance = 0;
     int notif_id = 16;
+    private ServiceCallback serviceCallback;
 
     private NotificationManager mNotifyManager;
     private NotificationCompat.Builder mBuilder;
@@ -47,9 +51,10 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     protected Boolean mRequestingLocationUpdates;
     protected Location mCurrentLocation;
     protected LocationRequest mLocationRequest;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 30000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 8000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final IBinder mBinder = new MyBinder();
+    private boolean recordDistance;
 
     public LocationBackgroundService() {
 
@@ -82,10 +87,11 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-
-
-
         return START_STICKY;
+    }
+
+    public void canRecordDistance(boolean b) {
+        recordDistance = b;
     }
 
     public class MyBinder extends Binder {
@@ -94,9 +100,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         }
     }
 
-
     public void createNotification(){
-
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -111,7 +115,10 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
                 .addAction(0, "STOP", contentIntent);
 
         startForeground(notif_id, mBuilder.getNotification());
+    }
 
+    public void setCallback(ServiceCallback callbacks) {
+        serviceCallback = callbacks;
     }
 
     @Nullable
@@ -138,37 +145,42 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    /** calculates the distance between two locations in MILES */
-    private double compareLocation(double lat1, double lng1, double lat2, double lng2) {
+    /** calculates the distance between two locations in meters */
+    private float compareLocation(double lat1, double lng1, double lat2, double lng2) {
 
-        double earthRadius = 3958.75; // in miles, change to 6371 for kilometer output
-
-        double dLat = Math.toRadians(lat2-lat1);
-        double dLng = Math.toRadians(lng2-lng1);
-
-        double sindLat = Math.sin(dLat / 2);
-        double sindLng = Math.sin(dLng / 2);
-
-        double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
-                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
-
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng / 2) * Math.sin(dLng / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        float dist = (float) (earthRadius * c);
 
-        double dist = earthRadius * c;
-
-        return dist; // output distance, in MILES
+        //Log.v(AppConstants.DEBUG_TAG,"compareLocation dist :"+dist);
+        return dist; // output distance, in meters
     }
 
     @Override
     public void onLocationChanged(Location location) {
 
         mCurrentLocation = location;
+        BigDecimal num = new BigDecimal(compareLocation(prevLocation.getLatitude(),prevLocation.getLongitude(),location.getLatitude(),location.getLongitude()));
+        String numWithNoExponents = num.toPlainString();
 
-        if(compareLocation(prevLocation.getLatitude(),prevLocation.getLongitude(),location.getLatitude(),location.getLongitude()) > 0.1){
+        Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
+
+        if(recordDistance && num.floatValue() > 1){
 
             distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
-            prevLocation = location;
+
+
+            Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
+
+            serviceCallback.updateDistance(distance);
         }
+
+        prevLocation = location;
 
         double latitude = mCurrentLocation.getLatitude();
         double longitude = mCurrentLocation.getLongitude();
@@ -265,22 +277,16 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         super.onDestroy();
         mGoogleApiClient.disconnect();
 
-        mBuilder.setAutoCancel(false);
-        //mNotifyManager.cancel(notif_id);
-        mBuilder.setContentTitle("Stored to  secure storage");
-        mBuilder.setContentText("Click here to reload the list.");
-        // Removes the progress bar
-        mBuilder.setProgress(0, 0, false);
-        //mNotifyManager.notify(notif_id, mBuilder.build());
-
-        mNotifyManager.notify(notif_id, mBuilder.getNotification());
-        stopForeground(true);
         stopSelf();
 
     }
 
     public void completeNotification(){
 
-
+        stopForeground(true);
+        mBuilder.setAutoCancel(true);
+        mBuilder.setOngoing(false);
+        mNotifyManager.notify(notif_id, mBuilder.getNotification());
+        mNotifyManager.cancel(notif_id);
     }
 }

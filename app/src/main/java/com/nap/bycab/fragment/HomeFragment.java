@@ -67,6 +67,8 @@ import com.nap.bycab.util.TouchableWrapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+
 public class HomeFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
@@ -89,6 +91,7 @@ public class HomeFragment extends Fragment {
     private RelativeLayout rootLayout;
     private Order currentOrder;
     private TextView tvStartStop;
+    private TextView etKmVal;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -118,7 +121,7 @@ public class HomeFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
-        tvTimeLeft= (TextView) view.findViewById(R.id.tvTimeLeft);
+        etKmVal= (TextView) view.findViewById(R.id.etKmVal);
         tvStartStop= (TextView) view.findViewById(R.id.tvStartStop);
         tvStartStop.setOnClickListener(new View.OnClickListener() {
 
@@ -130,6 +133,8 @@ public class HomeFragment extends Fragment {
                     //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
                     tvStartStop.setText("DONE");
 
+                    ((MainActivity)getActivity()).myService.canRecordDistance(false);
+                    ((MainActivity)getActivity()).myService.completeNotification();
                 }
                 else
                 {
@@ -137,8 +142,9 @@ public class HomeFragment extends Fragment {
                     //start button operation
                     //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
                     //callStartService();
-                    tvStartStop.setText("STOP");
 
+                    tvStartStop.setText("STOP");
+                    ((MainActivity)getActivity()).myService.canRecordDistance(true);
                     ((MainActivity)getActivity()).myService.createNotification();
                 }
             }
@@ -404,6 +410,14 @@ public class HomeFragment extends Fragment {
         MapsInitializer.initialize(this.getActivity());
          //This goes up to 21
         LatLng latLng=new LatLng(map.getMyLocation().getLatitude(),map.getMyLocation().getLongitude());
+    }
+
+    public void updateHomeFragmentDistance(double distance) {
+
+        DecimalFormat df = new DecimalFormat("0.000");
+        System.out.println(df.format(distance));
+
+        if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
     }
 
     /*

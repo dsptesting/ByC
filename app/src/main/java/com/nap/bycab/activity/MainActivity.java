@@ -68,11 +68,12 @@ import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.LocationBackgroundService;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
+import com.nap.bycab.util.ServiceCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectionCallbacks, OnConnectionFailedListener, LocationListener, ServiceCallback {
 
     private boolean isInternetAvailable;
     private NavigationView mDrawer;
@@ -101,6 +102,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Log.d("ServiceConnection","connected");
             LocationBackgroundService.MyBinder b = (LocationBackgroundService.MyBinder) service;
             myService = b.getService();
+            myService.setCallback(MainActivity.this);
         }
 
         @Override
@@ -659,5 +661,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     }
 
+    @Override
+    public void updateDistance(double distance) {
 
+        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentByTag("home_fragment");
+        if(fragment != null)fragment.updateHomeFragmentDistance(distance);
+
+    }
 }
