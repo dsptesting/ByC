@@ -58,6 +58,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
     public LocationBackgroundService() {
 
+        Log.v(AppConstants.DEBUG_TAG,"SERVICE LocationBackgroundService");
         distanceCalculator = new DistanceCalculator();
     }
 
@@ -65,6 +66,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     public void onCreate() {
         super.onCreate();
 
+        Log.v(AppConstants.DEBUG_TAG, "SERVICE onCreate");
 //location update
         mRequestingLocationUpdates = false;
 
@@ -87,6 +89,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.v(AppConstants.DEBUG_TAG,"SERVICE onStartCommand");
         return START_STICKY;
     }
 
@@ -102,6 +105,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
     public void createNotification(){
 
+        Log.v(AppConstants.DEBUG_TAG,"SERVICE createNotification");
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("isNotificationLocation", true);
@@ -275,6 +279,9 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        Log.v(AppConstants.DEBUG_TAG,"SERVICE onDestroy");
+
         mGoogleApiClient.disconnect();
 
         stopSelf();
@@ -282,7 +289,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     }
 
     public void completeNotification(){
-
+        Log.v(AppConstants.DEBUG_TAG,"SERVICE completeNotification");
         stopForeground(true);
         mBuilder.setAutoCancel(true);
         mBuilder.setOngoing(false);

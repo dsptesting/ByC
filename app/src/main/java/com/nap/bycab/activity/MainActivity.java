@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected Boolean mRequestingLocationUpdates;
     private Intent serviceIntent;
     public LocationBackgroundService myService;
+    private boolean cancelStopNotification;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -103,6 +104,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             LocationBackgroundService.MyBinder b = (LocationBackgroundService.MyBinder) service;
             myService = b.getService();
             myService.setCallback(MainActivity.this);
+
+            if(cancelStopNotification){
+
+                myService.completeNotification();
+            }
         }
 
         @Override
@@ -118,7 +124,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         isInternetAvailable=isInternetAvailable();
 
-        handleNotification(getIntent());
 
         driver=PrefUtils.getCurrentDriver(MainActivity.this);
 
@@ -155,12 +160,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
         serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
-        //startService(serviceIntent);
+        startService(serviceIntent);
 
         // To call onServiceConnected() if the service already started
         bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
 
 
+        handleNotification(getIntent());
     }
 
     @Override
@@ -172,8 +178,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onDestroy() {
         //stopService(serviceIntent);
-        super.onDestroy();
         unbindService(serviceConnection);
+        super.onDestroy();
     }
 
     @Override
@@ -197,11 +203,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if(isNotificationLocation){
 
             // handle direct implementation of current ride popup
-            notificationManager.cancelAll();
-
+            cancelStopNotification = true;
 
         }
         else{
+            cancelStopNotification = false;
             if(isForCurrentRide){
 
                 NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
