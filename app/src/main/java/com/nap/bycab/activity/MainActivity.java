@@ -171,14 +171,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 //        }
 
 
-<<<<<<< Updated upstream
-=======
-
-
-
-        Log.e("error", "nirav");
-        handleNotification(getIntent());
->>>>>>> Stashed changes
     }
 
     @Override
@@ -214,7 +206,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onNewIntent(intent);
 
         Log.v(AppConstants.DEBUG_TAG, "onNewIntent");
-        Log.e("error", "nirav intent");
+
         handleNotification(intent);
     }
 
@@ -233,7 +225,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             cancelStopNotification = true;
 
         }
-<<<<<<< Updated upstream
         else if(isForCurrentRide){
 
             cancelStopNotification = false;
@@ -252,30 +243,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if(notificationList != null && notificationList.getIdList() != null){
                 for(int i = 0;i<notificationList.getIdList().size();i++){
                     notificationManager.cancel(notificationList.getIdList().get(i));
-=======
-        else{
-
-
-                cancelStopNotification = false;
-                if (isForCurrentRide) {
-
-                    NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
-                    for (int i = 0; i < notificationList.getIdList().size(); i++) {
-                        notificationManager.cancel(notificationList.getIdList().get(i));
-                    }
-                    PrefUtils.clearCurrentNotificationIdList(this);
-                } else {
-
-
-                    NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
-                    for (int i = 0; i < notificationList.getIdList().size(); i++) {
-                        notificationManager.cancel(notificationList.getIdList().get(i));
-                    }
-                    PrefUtils.clearUpcomingNotificationIdList(this);
->>>>>>> Stashed changes
                 }
-
-
+                PrefUtils.clearUpcomingNotificationIdList(this);
+            }
         }
     }
 
@@ -322,7 +292,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             @Override
             public void error(String error) {
-               // progressDialog.dismiss();
+                // progressDialog.dismiss();
             }
         }.call();
     }
@@ -654,7 +624,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     protected void onStop() {
-       // mGoogleApiClient.disconnect();
+        // mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -705,7 +675,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             HomeFragment.map.clear();
 
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-                Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
         } catch (Exception e){
             e.printStackTrace();
