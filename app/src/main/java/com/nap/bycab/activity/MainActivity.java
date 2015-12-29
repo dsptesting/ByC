@@ -1,5 +1,6 @@
 package com.nap.bycab.activity;
 
+import android.app.ActivityManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
@@ -94,8 +95,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
     protected Boolean mRequestingLocationUpdates;
+    private boolean isAlertOpen;
     private Intent serviceIntent;
     public LocationBackgroundService myService;
+    private boolean userWantsToExit;
     private boolean cancelStopNotification;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -116,7 +119,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             Log.d("ServiceConnection","disconnected");
             myService = null;
         }
-    };;
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +135,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
             buildAlertMessageNoGps();
+        }
+        else{
+            serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
+            startService(serviceIntent);
+
+            // To call onServiceConnected() if the service already started
+            bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
         }
 
         /*//location update
@@ -159,11 +169,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 
 
-        serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
-        startService(serviceIntent);
 
-        // To call onServiceConnected() if the service already started
-        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
 
 
         handleNotification(getIntent());
@@ -178,8 +184,23 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     protected void onDestroy() {
         //stopService(serviceIntent);
-        unbindService(serviceConnection);
+       /* boolean isBound = false;
+        isBound = getApplicationContext().bindService( new Intent(getApplicationContext(), LocationBackgroundService.class), serviceConnection, Context.BIND_AUTO_CREATE );*/
+        if (isMyServiceRunning(LocationBackgroundService.class)){
+            unbindService(serviceConnection);
+        }
         super.onDestroy();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Toast.makeText(getApplicationContext(),"serviceClass: "+serviceClass.getName()+", "+service.service.getClassName(),Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -284,24 +305,61 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void buildAlertMessageNoGps() {
 
+        Log.v(AppConstants.DEBUG_TAG,"buildAlertMessageNoGps called ");
+
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage("Your GPS seems to be disabled, enable it to continue!")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
                         dialog.cancel();
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        isAlertOpen = false;
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS),3);
                     }
                 })
                 .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
+                        userWantsToExit = true;
+                        isAlertOpen = false;
                         dialog.cancel();
-                       finish();
+                        finish();
                     }
                 });
         final AlertDialog alert = builder.create();
 
         alert.show();
+
+        isAlertOpen = true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 3){
+            if(!isAlertOpen){
+
+                LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+                if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+                    Log.v(AppConstants.DEBUG_TAG,"userWantsToExit :"+userWantsToExit);
+                    if(userWantsToExit){
+                        finish();
+                    }
+                    else{
+                        buildAlertMessageNoGps();
+                    }
+                }
+                else{
+                    serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
+                    startService(serviceIntent);
+
+                    // To call onServiceConnected() if the service already started
+                    bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+                }
+            }
+
+        }
+
     }
 
     @Override
@@ -533,6 +591,29 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         /*if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }*/
+
+       /* if(!isAlertOpen){
+
+            LocationManager  manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+            if ( !manager.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+                Log.v(AppConstants.DEBUG_TAG,"userWantsToExit :"+userWantsToExit);
+                if(userWantsToExit){
+                    finish();
+                }
+                else{
+                    buildAlertMessageNoGps();
+                }
+            }
+            else{
+                serviceIntent = new Intent(MainActivity.this, LocationBackgroundService.class);
+                startService(serviceIntent);
+
+                // To call onServiceConnected() if the service already started
+                bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+            }
+        }
+*/
+
     }
 
     @Override
