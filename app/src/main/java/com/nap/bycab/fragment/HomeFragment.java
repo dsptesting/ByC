@@ -186,6 +186,7 @@ public class HomeFragment extends Fragment {
         });*/
 
 
+
         tvGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -549,6 +550,26 @@ public class HomeFragment extends Fragment {
 
         if(mapView != null) mapView.onResume();
         super.onResume();
+        try {
+            Location mCurrentLocation = ((MainActivity) getActivity()).myService.getCurrentLocation();
+            if (mCurrentLocation != null) {
+                double latitude = mCurrentLocation.getLatitude();
+                double longitude = mCurrentLocation.getLongitude();
+                try {
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15);
+                    HomeFragment.map.animateCamera(cameraUpdate);
+                    HomeFragment.map.clear();
+
+                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
+                    Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+//            callLocationUpdate();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

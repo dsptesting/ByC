@@ -440,6 +440,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 fragmentTransaction.replace(R.id.main_container, homeFragment,"home_fragment");
                 fragmentTransaction.commit();
+
+
                 break;
 
             case R.id.navigation_item_2:

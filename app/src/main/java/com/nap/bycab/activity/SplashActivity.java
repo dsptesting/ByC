@@ -31,6 +31,7 @@ public class SplashActivity extends AppCompatActivity {
     private GoogleCloudMessaging gcm;
     private String regid;
     private String PROJECT_NUMBER = "414298641591";
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class SplashActivity extends AppCompatActivity {
             if (PrefUtils.getCurrentDriver(SplashActivity.this) != null) {
 
                 findViewById(R.id.btnLogin).setVisibility(View.GONE);
-                new CountDownTimer(2000, 1000) {
+                countDownTimer=  new CountDownTimer(2000, 1000) {
 
                     public void onTick(long millisUntilFinished) {
 
@@ -161,7 +162,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (regid == null || regid == "") {
                     coomonAlertDialog("Error...","Unable to find Device ID, try again!",true);
                 } else {
-                    new CountDownTimer(2000, 1000) {
+                    countDownTimer=  new CountDownTimer(2000, 1000) {
 
                         public void onTick(long millisUntilFinished) {
 
@@ -223,4 +224,15 @@ public class SplashActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            countDownTimer.cancel();
+        } catch (NullPointerException ne){
+            ne.printStackTrace();
+        }
+    }
 }
