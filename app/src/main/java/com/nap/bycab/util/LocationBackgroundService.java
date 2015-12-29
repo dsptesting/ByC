@@ -295,5 +295,6 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         mBuilder.setOngoing(false);
         mNotifyManager.notify(notif_id, mBuilder.getNotification());
         mNotifyManager.cancel(notif_id);
+
     }
 }

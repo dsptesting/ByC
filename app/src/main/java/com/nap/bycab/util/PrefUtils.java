@@ -106,4 +106,19 @@ public class PrefUtils {
         NotificationList notificationList = complexPreferences.getObject("CurrentNotificationIdList", NotificationList.class);
         return notificationList;
     }
+
+    public static void setServiceRunningInBackground(boolean serviceRunningInBackground, Context ctx){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("serviceRunningInBackground", serviceRunningInBackground);
+        editor.apply();
+    }
+
+    public static boolean isServiceRunningInBackground(Context ctx) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return preferences.getBoolean("serviceRunningInBackground", false);
+
+    }
+
+
 }

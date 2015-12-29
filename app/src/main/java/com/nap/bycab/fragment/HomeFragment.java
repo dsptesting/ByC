@@ -172,6 +172,7 @@ public class HomeFragment extends Fragment {
                     tvStartStop.setText("DONE");
 
                     ((MainActivity)getActivity()).myService.canRecordDistance(false);
+                    PrefUtils.setServiceRunningInBackground(false, getActivity());
                     ((MainActivity)getActivity()).myService.completeNotification();
 
                     Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
@@ -195,6 +196,7 @@ public class HomeFragment extends Fragment {
 
                     tvStartStop.setText("STOP");
                     ((MainActivity)getActivity()).myService.canRecordDistance(true);
+                    PrefUtils.setServiceRunningInBackground(true, getActivity());
                     ((MainActivity)getActivity()).myService.createNotification();
                 }
             }

@@ -187,6 +187,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (isMyServiceRunning(LocationBackgroundService.class)){
             unbindService(serviceConnection);
         }
+
+        if(!PrefUtils.isServiceRunningInBackground(this)){
+            stopService(new Intent(MainActivity.this,LocationBackgroundService.class));
+        }
         super.onDestroy();
     }
 
@@ -300,7 +304,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void buildAlertMessageNoGps() {
 
-        Log.v(AppConstants.DEBUG_TAG,"buildAlertMessageNoGps called ");
+        Log.v(AppConstants.DEBUG_TAG, "buildAlertMessageNoGps called ");
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setMessage("Your GPS seems to be disabled, enable it to continue!")
