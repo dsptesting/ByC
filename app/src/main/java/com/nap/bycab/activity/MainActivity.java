@@ -144,6 +144,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
         }
 
+        handleNotification(getIntent());
+
+
         /*//location update
         mRequestingLocationUpdates = false;
 
@@ -168,11 +171,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 //        }
 
 
-
-
-
-
-        handleNotification(getIntent());
     }
 
     @Override
@@ -227,31 +225,28 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             cancelStopNotification = true;
 
         }
-        else{
-            cancelStopNotification = false;
-            if(isForCurrentRide){
+        else if(isForCurrentRide){
 
-                NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+            cancelStopNotification = false;
+            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+            if(notificationList != null && notificationList.getIdList() != null){
                 for(int i = 0;i<notificationList.getIdList().size();i++){
                     notificationManager.cancel(notificationList.getIdList().get(i));
                 }
                 PrefUtils.clearCurrentNotificationIdList(this);
             }
-            else{
+        }
+        else if(!isForCurrentRide){
 
-                NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+            cancelStopNotification = false;
+            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+            if(notificationList != null && notificationList.getIdList() != null){
                 for(int i = 0;i<notificationList.getIdList().size();i++){
                     notificationManager.cancel(notificationList.getIdList().get(i));
                 }
                 PrefUtils.clearUpcomingNotificationIdList(this);
             }
         }
-
-
-        /*if(intent.getIntExtra("notification_id", 0) != 0){
-
-            notificationManager.cancel(intent.getIntExtra("notification_id", 0));
-        }*/
     }
 
     private void callDriverStatusService(boolean isChecked) {
