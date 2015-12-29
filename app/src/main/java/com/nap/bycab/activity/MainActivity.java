@@ -171,6 +171,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 //        }
 
 
+<<<<<<< Updated upstream
+=======
+
+
+
+        Log.e("error", "nirav");
+        handleNotification(getIntent());
+>>>>>>> Stashed changes
     }
 
     @Override
@@ -206,7 +214,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onNewIntent(intent);
 
         Log.v(AppConstants.DEBUG_TAG, "onNewIntent");
-
+        Log.e("error", "nirav intent");
         handleNotification(intent);
     }
 
@@ -225,6 +233,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             cancelStopNotification = true;
 
         }
+<<<<<<< Updated upstream
         else if(isForCurrentRide){
 
             cancelStopNotification = false;
@@ -243,9 +252,30 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             if(notificationList != null && notificationList.getIdList() != null){
                 for(int i = 0;i<notificationList.getIdList().size();i++){
                     notificationManager.cancel(notificationList.getIdList().get(i));
+=======
+        else{
+
+
+                cancelStopNotification = false;
+                if (isForCurrentRide) {
+
+                    NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+                    for (int i = 0; i < notificationList.getIdList().size(); i++) {
+                        notificationManager.cancel(notificationList.getIdList().get(i));
+                    }
+                    PrefUtils.clearCurrentNotificationIdList(this);
+                } else {
+
+
+                    NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+                    for (int i = 0; i < notificationList.getIdList().size(); i++) {
+                        notificationManager.cancel(notificationList.getIdList().get(i));
+                    }
+                    PrefUtils.clearUpcomingNotificationIdList(this);
+>>>>>>> Stashed changes
                 }
-                PrefUtils.clearUpcomingNotificationIdList(this);
-            }
+
+
         }
     }
 

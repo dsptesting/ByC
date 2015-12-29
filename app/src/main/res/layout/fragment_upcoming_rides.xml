@@ -5,7 +5,14 @@
     android:background="#efefef"
     android:id="@+id/rootUpcomingRides"
     tools:context="com.nap.bycab.fragment.MyRidesFragment">
-
+    <TextView
+        android:id="@+id/tvUpcomingRideEmpty"
+        android:layout_gravity="center"
+        android:textColor="#555"
+        android:textSize="22sp"
+        android:text="No new ride request yet!"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <ListView
         android:id="@+id/lvUpcomingRides"
         android:layout_width="match_parent"

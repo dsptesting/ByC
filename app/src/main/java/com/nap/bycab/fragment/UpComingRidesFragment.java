@@ -42,6 +42,8 @@ public class UpComingRidesFragment extends Fragment {
     private String mParam2;
     private View view;
 
+    private TextView tvUpcomingRideEmpty;
+
     public static UpComingRidesFragment newInstance(String param1, String param2) {
         UpComingRidesFragment fragment = new UpComingRidesFragment();
         Bundle args = new Bundle();
@@ -113,7 +115,8 @@ public class UpComingRidesFragment extends Fragment {
         rootUpcomingRides = (FrameLayout) view.findViewById(R.id.rootUpcomingRides);
 
         lvUpcomingRides = (ListView) view.findViewById(R.id.lvUpcomingRides);
-
+        tvUpcomingRideEmpty= (TextView) view.findViewById(R.id.tvUpcomingRideEmpty);
+        lvUpcomingRides.setEmptyView(tvUpcomingRideEmpty);
         myAdapter = new MyAdapter(getActivity(), alUpcomingRides);
 
         lvUpcomingRides.setAdapter(myAdapter);

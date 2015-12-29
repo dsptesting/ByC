@@ -42,6 +42,8 @@ public class MyRidesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private TextView tvMyRideEmpty;
+
     public static MyRidesFragment newInstance(String param1, String param2) {
 
         MyRidesFragment fragment = new MyRidesFragment();
@@ -70,6 +72,7 @@ public class MyRidesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_my_rides, container, false);
+
 
         ((MainActivity)getActivity()).getSupportActionBar().show();
 
@@ -157,7 +160,8 @@ public class MyRidesFragment extends Fragment {
     private void initUi() {
 
         lvUpcomingRides = (ListView) view.findViewById(R.id.lvUpcomingRides);
-
+        tvMyRideEmpty= (TextView) view.findViewById(R.id.tvMyRideEmpty);
+        lvUpcomingRides.setEmptyView(tvMyRideEmpty);
         myAdapter = new MyAdapter(getActivity(), alRides);
 
         lvUpcomingRides.setAdapter(myAdapter);
