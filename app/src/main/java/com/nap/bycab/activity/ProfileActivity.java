@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.models.CommonResponse;
+import com.nap.bycab.models.Driver;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
@@ -33,16 +35,32 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.regex.Pattern;
 
 public class ProfileActivity extends BaseActivity {
 
     private Dialog alertDialog;
     private LinearLayout llProfile;
     private ProgressWheel pageLoader;
+    private EditText tvAccountEmailVal,tvMobile,tvNameVal,tvDriverLicNoVal,tvAdharNoVal,tvVehicleDesVal;
+    private Driver driver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tvAccountEmailVal= (EditText) findViewById(R.id.tvAccountEmailVal);
+        tvMobile= (EditText) findViewById(R.id.tvMobileVal);
+        tvNameVal= (EditText) findViewById(R.id.tvNameVal);
+        tvDriverLicNoVal= (EditText) findViewById(R.id.tvDriverLicNoVal);
+        tvAdharNoVal= (EditText) findViewById(R.id.tvAdharNoVal);
+        tvVehicleDesVal= (EditText) findViewById(R.id.tvVehicleDesVal);
+        driver= PrefUtils.getCurrentDriver(this);
+        tvAccountEmailVal.setText(driver.getEmailId());
+        tvMobile.setText(driver.getMobileNo());
+        tvNameVal.setText(driver.getName());
+        tvDriverLicNoVal.setText(driver.getLicenceNo());
+        tvAdharNoVal.setText(driver.getAdharNo());
+        tvVehicleDesVal.setText(driver.getVehicleDescription());
 
         initData();
         initUi();
@@ -95,6 +113,8 @@ public class ProfileActivity extends BaseActivity {
 
         final EditText tvReNewPass = (EditText)dialogView.findViewById(R.id.tvReNewPass);
 
+        final EditText tvNewPass =  (EditText)dialogView.findViewById(R.id.tvNewPass);
+
         pageLoader = (ProgressWheel) dialogView.findViewById(R.id.pageLoader);
 
         LinearLayout llChange = (LinearLayout) dialogView.findViewById(R.id.llChange);
@@ -103,18 +123,23 @@ public class ProfileActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                if(validateInputs(dialogView)){
+                if (validateInputs(dialogView)) {
 
                     if (tvReNewPass != null) {
                         InputMethodManager inputManager = (InputMethodManager) ProfileActivity.this.getSystemService(INPUT_METHOD_SERVICE);
                         inputManager.hideSoftInputFromWindow(tvReNewPass.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
 
-                    cancelThisDialog();
+                    if (tvNewPass.getText().toString().trim().length() > 0 && tvReNewPass.getText().toString().trim().length() > 0 &&
+                            tvNewPass.getText().toString().equals(tvReNewPass.getText().toString())) {
+                        cancelThisDialog();
 
-                    callChangePassService(dialogView);
-
-
+                        callChangePassService(dialogView);
+                    } else {
+                        Snackbar snackbar = Snackbar.make(llProfile, "Enter valid new password", Snackbar.LENGTH_LONG);
+                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                        snackbar.show();
+                    }
                 }
             }
         });
@@ -236,16 +261,18 @@ public class ProfileActivity extends BaseActivity {
 
             JSONObject object = new JSONObject();
             try {
-                object.put("MobileNo", ((EditText)findViewById(R.id.tvMobileVal)).getText().toString() + "");
-                object.put("AadharNo", ((EditText)findViewById(R.id.tvAdharNoVal)).getText().toString() + "");
-                object.put("LicenceNo", ((EditText)findViewById(R.id.tvDriverLicNoVal)).getText().toString() + "");
-                object.put("Name", ((EditText)findViewById(R.id.tvNameVal)).getText().toString() + "");
-                object.put("VehicalDesc", ((EditText)findViewById(R.id.tvVehicleDesVal)).getText().toString() + "");
-                object.put("Id", PrefUtils.getCurrentDriver(ProfileActivity.this).getDriverId() + "");
-                object.put("DriverStatus", PrefUtils.getCurrentDriver(ProfileActivity.this).getDriverStatus() + "");
-                object.put("GCMID", PrefUtils.getCurrentDriver(ProfileActivity.this).getNotificationId() + "");
-                object.put("EmailId", PrefUtils.getCurrentDriver(ProfileActivity.this).getEmailId() + "");
-                object.put("Password", PrefUtils.getCurrentDriver(ProfileActivity.this).getPassword() + "");
+
+                object.put("MobileNo", tvMobile.getText().toString().trim() + "");
+                object.put("EmailId", tvAccountEmailVal.getText().toString().trim() + "");
+                object.put("AadharNo",  "");
+                object.put("LicenceNo", "");
+                object.put("Name", "");
+                object.put("VehicalDesc",  "");
+                object.put("Id","");
+                object.put("DriverStatus","");
+                object.put("GCMID", "");
+                object.put("Password","");
+
                 Log.e(AppConstants.DEBUG_TAG, "callUpdateProfileService request: " + object.toString());
             }
             catch (JSONException e) {
@@ -348,10 +375,26 @@ public class ProfileActivity extends BaseActivity {
 
         if (id == R.id.action_save) {
 
-            callUpdateProfileService();
+            if(!isEmailMatch(tvAccountEmailVal)){
+                Snackbar snackbar = Snackbar.make(llProfile, "Enter Valid Email", Snackbar.LENGTH_LONG);
+                snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                snackbar.show();
+            } else if(tvMobile.getText().toString().trim().length()!=10){
+                Snackbar snackbar = Snackbar.make(llProfile, "Enter Valid Mobile", Snackbar.LENGTH_LONG);
+                snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                snackbar.show();
+            } else {
+                callUpdateProfileService();
+            }
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isEmailMatch(EditText param1) {
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(param1.getText().toString()).matches();
     }
 }
