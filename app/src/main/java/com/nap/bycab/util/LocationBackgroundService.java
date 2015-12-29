@@ -252,6 +252,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         }
     }
 
+    //testin..
     public void startUpdatesButtonHandler() {
         if (!mRequestingLocationUpdates) {
             mRequestingLocationUpdates = true;
