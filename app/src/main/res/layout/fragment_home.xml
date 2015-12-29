@@ -177,12 +177,12 @@
                     android:textColor="#333"
                     android:textSize="15sp" />
 
-                <TextView
+                <Chronometer
                     android:id="@+id/etTimeVal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:text="00.00 mins"
+                    android:text="00.00"
                     android:textColor="#333"
                     android:textSize="15sp" />
 
@@ -224,7 +224,8 @@
                 android:layout_marginTop="15dp"
                 android:orientation="horizontal">
 
-                <android.support.v7.widget.SwitchCompat xmlns:app="http://schemas.android.com/apk/res-auto"
+                <android.support.v7.widget.SwitchCompat
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/switchWait"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -237,13 +238,13 @@
                     android:textOn=""
                     app:showText="true" />
 
-                <TextView
+                <Chronometer
                     android:id="@+id/etWaitTimeVal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_toRightOf="@+id/switchWait"
-                    android:text="00.00 mins"
+                    android:text="00.00"
                     android:textColor="#333"
                     android:textSize="15sp" />
 

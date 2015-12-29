@@ -14,11 +14,13 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -28,6 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -51,6 +55,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.BaseActivity;
+import com.nap.bycab.activity.FairActivity;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Driver;
@@ -92,6 +97,9 @@ public class HomeFragment extends Fragment {
     private Order currentOrder;
     private TextView tvStartStop;
     private TextView etKmVal;
+    private Chronometer etWaitTimeVal,etTimeVal;
+    private SwitchCompat switchWait;
+    private long mLastStopTime;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -123,6 +131,36 @@ public class HomeFragment extends Fragment {
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
         etKmVal= (TextView) view.findViewById(R.id.etKmVal);
         tvStartStop= (TextView) view.findViewById(R.id.tvStartStop);
+
+        etTimeVal= (Chronometer) view.findViewById(R.id.etTimeVal);
+        etWaitTimeVal= (Chronometer) view.findViewById(R.id.etWaitTimeVal);
+
+
+        switchWait= (SwitchCompat) view.findViewById(R.id.switchWait);
+        switchWait.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    // on first start
+                    if ( mLastStopTime == 0 )
+                        etWaitTimeVal.setBase( SystemClock.elapsedRealtime() );
+                        // on resume after pause
+                    else
+                    {
+                        long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+                        etWaitTimeVal.setBase( etWaitTimeVal.getBase() + intervalOnPause );
+                    }
+
+                    etWaitTimeVal.start();
+                    etWaitTimeVal.start();
+                } else {
+
+                    etWaitTimeVal.stop();
+                    mLastStopTime = SystemClock.elapsedRealtime();
+                }
+            }
+        });
+
         tvStartStop.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -135,9 +173,21 @@ public class HomeFragment extends Fragment {
 
                     ((MainActivity)getActivity()).myService.canRecordDistance(false);
                     ((MainActivity)getActivity()).myService.completeNotification();
+
+                    Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+
+                    etTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.stop();
+
+                    Intent i=new Intent(getActivity(), FairActivity.class);
+                    startActivity(i);
                 }
                 else
                 {
+
+                    etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.start();
                     isStarted=true;
                     //start button operation
                     //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
