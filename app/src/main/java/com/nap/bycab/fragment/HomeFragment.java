@@ -190,7 +190,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.e("gps...","clicked");
-                Location mCurrentLocation = ((MainActivity) getActivity()).getCurrentLocation();
+                Location mCurrentLocation = ((MainActivity) getActivity()).myService.getCurrentLocation();
                 if(mCurrentLocation != null){
                     double latitude = mCurrentLocation.getLatitude();
                     double longitude = mCurrentLocation.getLongitude();
