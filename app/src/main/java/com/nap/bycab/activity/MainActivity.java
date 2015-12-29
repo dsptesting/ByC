@@ -74,7 +74,7 @@ import com.nap.bycab.util.ServiceCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,ConnectionCallbacks, OnConnectionFailedListener, LocationListener, ServiceCallback {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ServiceCallback {
 
     private boolean isInternetAvailable;
     private NavigationView mDrawer;
@@ -538,6 +538,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
+/*
 
     //Location Update Code
     protected synchronized void buildGoogleApiClient() {
@@ -581,6 +582,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
+*/
 
     @Override
     public void onResume() {
@@ -631,7 +633,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     }
 
 
-    @Override
+   /* @Override
     public void onConnected(Bundle connectionHint) {
         Log.i(TAG, "Connected to GoogleApiClient");
         if (mCurrentLocation == null) {
@@ -697,7 +699,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
-    }
+    }*/
 
     private void callLocationUpdate() {
 

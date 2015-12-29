@@ -251,7 +251,7 @@ public class HomeFragment extends Fragment {
                         HomeFragment.map.clear();
 
                         HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-                        Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                   //     Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -611,7 +611,7 @@ public class HomeFragment extends Fragment {
                     HomeFragment.map.clear();
 
                     HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-                    Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
                 } catch (Exception e) {
                     e.printStackTrace();

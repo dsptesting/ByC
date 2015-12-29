@@ -51,7 +51,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     protected Boolean mRequestingLocationUpdates;
     protected Location mCurrentLocation;
     protected LocationRequest mLocationRequest;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 8000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 12000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final IBinder mBinder = new MyBinder();
     private boolean recordDistance;
@@ -173,7 +173,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         String numWithNoExponents = num.toPlainString();
 
         Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
-
+        Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
         if(recordDistance && num.floatValue() > 1){
 
             distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
@@ -181,10 +181,10 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
 
+            prevLocation = location;
             serviceCallback.updateDistance(distance);
         }
 
-        prevLocation = location;
 
         double latitude = mCurrentLocation.getLatitude();
         double longitude = mCurrentLocation.getLongitude();
@@ -195,7 +195,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
             HomeFragment.map.clear();
 
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-            Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
         } catch (Exception e){
             e.printStackTrace();
