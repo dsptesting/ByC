@@ -42,6 +42,7 @@ import com.nap.bycab.R;
 import com.nap.bycab.activity.FairActivity;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.models.CommonResponse;
+import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.models.Ticket;
@@ -86,6 +87,8 @@ public class HomeFragment extends Fragment {
     private VpCurrentRideAdapter vpCurrentRideAdapter;
 
     public double finalDistance;
+    private Driver driver;
+    Ticket ticket;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -118,6 +121,7 @@ public class HomeFragment extends Fragment {
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
         etKmVal= (TextView) view.findViewById(R.id.etKmVal);
         tvStartStop= (TextView) view.findViewById(R.id.tvStartStop);
+        driver=PrefUtils.getCurrentDriver(getActivity());
 
         etTimeVal= (Chronometer) view.findViewById(R.id.etTimeVal);
         etWaitTimeVal= (Chronometer) view.findViewById(R.id.etWaitTimeVal);
@@ -137,7 +141,7 @@ public class HomeFragment extends Fragment {
                         etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
                     }
 
-                    etWaitTimeVal.start();
+
                     etWaitTimeVal.start();
                 } else {
 
@@ -160,14 +164,36 @@ public class HomeFragment extends Fragment {
                     ((MainActivity)getActivity()).myService.canRecordDistance(false);
                     PrefUtils.setServiceRunningInBackground(false, getActivity());
                     ((MainActivity)getActivity()).myService.completeNotification();
-                    Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+//                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+//                    etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
+
+                    try {
+                        PrefUtils.clearCurrentDriver(getActivity());
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+
+                    if(switchWait.isChecked()){
+                        ticket=new Ticket(driver.getName(),driver.getMobileNo(),(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+"",(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+"",finalDistance+"");
+                        Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+                    } else {
+                        ticket =new Ticket(driver.getName(),driver.getMobileNo(),(mLastStopTime-etWaitTimeVal.getBase())/1000+"",(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+"",finalDistance+"");
+                        Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(mLastStopTime-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+                    }
+
                     etTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.stop();
 
+//                    Intent i=new Intent(getActivity(), FairActivity.class);
+//                    startActivity(i);
+
+
+//                    Toast.makeText(getActivity(), "time " +ticket.getWaitTime()+ " seconds \n wait time " +ticket.getDurationTime()+ " seconds", Toast.LENGTH_LONG).show();
+
+                    PrefUtils.setTicketInfo(ticket,getActivity());
                     Intent i=new Intent(getActivity(), FairActivity.class);
                     startActivity(i);
-
-
 
                 }
                 else
