@@ -92,7 +92,11 @@ public class GcmMessageHandler extends IntentService {
         Random random = new Random();
         int m = random.nextInt(9999 - 1000) + 1000;
 
-        if(!Boolean.parseBoolean(response.getString("IsOrderCompleted"))){
+        // TODO is this right init place for this
+        if(PrefUtils.getUpcomingNotificationIdList(this) == null) PrefUtils.setUpcomingNotificationIdList(new NotificationList(), this);
+        if(PrefUtils.getCurrentNotificationIdList(this) == null) PrefUtils.setCurrentNotificationIdList(new NotificationList(), this);
+
+        if(Boolean.parseBoolean(response.getString("IsOrderCompleted"))){
 
             // Order completed... handler it.
             Log.v(AppConstants.DEBUG_TAG, "Order completed Noti Id: " + m);
@@ -102,32 +106,38 @@ public class GcmMessageHandler extends IntentService {
             // upcoming ride..
             Log.v(AppConstants.DEBUG_TAG, "upcoming ride Noti Id: " + m);
 
-            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(GcmMessageHandler.this);
+            NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
             notificationList.getIdList().add(new Integer(m));
-            PrefUtils.setUpcomingNotificationIdList(notificationList,GcmMessageHandler.this);
+           // Log.v(AppConstants.DEBUG_TAG, "nnn u notificationList: " + notificationList.getIdList());
+            PrefUtils.setUpcomingNotificationIdList(notificationList,this);
         }
         else if(Boolean.parseBoolean(response.getString("IsCurrentRide"))){
 
             // current ride...
             Log.v(AppConstants.DEBUG_TAG, "current ride Noti Id: " + m);
 
-            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(GcmMessageHandler.this);
+            NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
             notificationList.getIdList().add(new Integer(m));
-            PrefUtils.setCurrentNotificationIdList(notificationList, GcmMessageHandler.this);
+            //Log.v(AppConstants.DEBUG_TAG, "nnn c notificationList: " + notificationList.getIdList());
+            PrefUtils.setCurrentNotificationIdList(notificationList, this);
         }
 
+        /*Log.v(AppConstants.DEBUG_TAG, "PrefUtils.getUpcomingNotificationIdList(GcmMessageHandler.this) " + PrefUtils.getUpcomingNotificationIdList(this));
+        Log.v(AppConstants.DEBUG_TAG, "PrefUtils.getCurrentNotificationIdList(GcmMessageHandler.this) " + PrefUtils.getCurrentNotificationIdList(this));*/
+
+
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
-        intent.putExtra("is_current_ride", true);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
+        intent.putExtra("IsCurrentRide", Boolean.parseBoolean(response.getString("IsCurrentRide")));
         intent.putExtra("isNotificationLocation", false);
         intent.putExtra("notification_id", m);
         intent.setAction(""+m);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GcmMessageHandler.this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(response.getString("contentTitle").toString())
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
-                        .setContentText(response.getString("message").toString())
+                        .setContentText(response.getString("message").toString()+", "+m)
                         .setPriority(Notification.PRIORITY_MAX)
                         .setOngoing(true);
 

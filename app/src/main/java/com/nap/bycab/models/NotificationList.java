@@ -1,5 +1,9 @@
 package com.nap.bycab.models;
 
+import android.util.Log;
+
+import com.nap.bycab.util.AppConstants;
+
 import java.util.ArrayList;
 
 /**
@@ -9,8 +13,17 @@ public class NotificationList {
 
     private ArrayList<Integer> idList;
 
+    @Override
+    public String toString() {
+        return "NotificationList{" +
+                "idList=" + idList +
+                '}';
+    }
+
     public NotificationList() {
         idList = new ArrayList<>();
+
+        Log.v(AppConstants.DEBUG_TAG, "Constr NotificationList");
     }
 
     public ArrayList<Integer> getIdList() {

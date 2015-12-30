@@ -88,9 +88,7 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        // TODO is this right init place for this
-        PrefUtils.setUpcomingNotificationIdList(new NotificationList(), this);
-        PrefUtils.setCurrentNotificationIdList(new NotificationList(), this);
+
     }
 
     public void checkGCMStatus() {

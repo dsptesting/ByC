@@ -14,6 +14,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.support.design.widget.NavigationView;
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Driver driver;
     private SwitchCompat switchDriverStatus;
     private boolean isForCurrentRide;
+    private HomeFragment homeFragment;
 
     //location update
     protected static final String TAG = "location-updates-sample";
@@ -219,10 +221,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         isNotificationLocation = intent.getBooleanExtra("isNotificationLocation", false);
         isForCurrentRide = intent.getBooleanExtra("IsCurrentRide", false);
 
+        isForCurrentRide = true;
+
         Log.v(AppConstants.DEBUG_TAG, "Noti Id: " + intent.getIntExtra("notification_id", 0));
 
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
+        Log.v(AppConstants.DEBUG_TAG, "isNotificationLocation " + isNotificationLocation);
         if(isNotificationLocation){
 
             // handle direct implementation of current ride popup
@@ -233,21 +238,47 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             cancelStopNotification = false;
             NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
+
             if(notificationList != null && notificationList.getIdList() != null){
+
                 for(int i = 0;i<notificationList.getIdList().size();i++){
+
+                    Log.v(AppConstants.DEBUG_TAG, "clear c Noti Id: " + notificationList.getIdList().get(i));
                     notificationManager.cancel(notificationList.getIdList().get(i));
                 }
-                PrefUtils.clearCurrentNotificationIdList(this);
+
+                //call current ride webserivce..
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.v(AppConstants.DEBUG_TAG, "c fragment  " + homeFragment);
+                        if (homeFragment != null) homeFragment.callCurrentRideService();
+
+                        PrefUtils.clearCurrentNotificationIdList(MainActivity.this);
+                    }
+                }, 3000);
+
             }
         }
         else if(!isForCurrentRide){
 
             cancelStopNotification = false;
             NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
+
             if(notificationList != null && notificationList.getIdList() != null){
                 for(int i = 0;i<notificationList.getIdList().size();i++){
+
+                    Log.v(AppConstants.DEBUG_TAG, "clear u Noti Id: " + notificationList.getIdList().get(i));
                     notificationManager.cancel(notificationList.getIdList().get(i));
                 }
+
+                //call upcoming.. ride webserivce..
+                //TODO .. remove this call... its only for currentRide.. but notification doesnt conatin.. isForCurrentRide true.. so, it comes to execute this block.. only for testing..
+
+                Log.v(AppConstants.DEBUG_TAG, "u fragment  " + homeFragment);
+                if(homeFragment != null)homeFragment.callCurrentRideService();
+
                 PrefUtils.clearUpcomingNotificationIdList(this);
             }
         }
@@ -435,12 +466,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         switch(mSelectedId){
 
             case R.id.navigation_item_1:
+
+                Log.e(AppConstants.DEBUG_TAG,"navigation_item_1 loaded");
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 toolbar.setTitle("");
                 toolbar.setBackgroundColor(getResources().getColor(R.color.full_transperent));
                 fragmentManager = getFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
-                HomeFragment homeFragment = HomeFragment.newInstance("","");
+                homeFragment = HomeFragment.newInstance("", "");
 
                 fragmentTransaction.replace(R.id.main_container, homeFragment,"home_fragment");
                 fragmentTransaction.commit();

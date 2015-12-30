@@ -1,38 +1,26 @@
 package com.nap.bycab.fragment;
 
-import android.app.Activity;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SwitchCompat;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Chronometer;
 import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -44,41 +32,35 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
-import com.nap.bycab.activity.BaseActivity;
 import com.nap.bycab.activity.FairActivity;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.models.CommonResponse;
-import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.BottomViewPager;
-import com.nap.bycab.util.MapStateListener;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
-import com.nap.bycab.util.TouchableMapFragment;
-import com.nap.bycab.util.TouchableWrapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private ArrayList<Order> alCurrentRidesVp;
     private BottomViewPager pager=null;
     private CardView cvCurrentRideDetails;
     private String mParam1;
@@ -100,6 +82,7 @@ public class HomeFragment extends Fragment {
     private Chronometer etWaitTimeVal,etTimeVal;
     private SwitchCompat switchWait;
     private long mLastStopTime;
+    private VpCurrentRideAdapter vpCurrentRideAdapter;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -112,6 +95,7 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment() {
         // Required empty public constructor
+        alCurrentRidesVp = new ArrayList<>();
     }
 
     @Override
@@ -140,15 +124,14 @@ public class HomeFragment extends Fragment {
         switchWait.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
+                if (isChecked) {
                     // on first start
-                    if ( mLastStopTime == 0 )
-                        etWaitTimeVal.setBase( SystemClock.elapsedRealtime() );
+                    if (mLastStopTime == 0)
+                        etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
                         // on resume after pause
-                    else
-                    {
+                    else {
                         long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
-                        etWaitTimeVal.setBase( etWaitTimeVal.getBase() + intervalOnPause );
+                        etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
                     }
 
                     etWaitTimeVal.start();
@@ -205,7 +188,7 @@ public class HomeFragment extends Fragment {
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
 
-        new CountDownTimer(3000, 1000) {
+        /*new CountDownTimer(3000, 1000) {
 
             public void onTick(long millisUntilFinished) {
 
@@ -214,7 +197,7 @@ public class HomeFragment extends Fragment {
             public void onFinish() {
                 callCurrentRideService();
             }
-        }.start();
+        }.start();*/
 
         /*
         new CountDownTimer(120000, 1000) {
@@ -283,13 +266,13 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void callCurrentRideService() {
+    public void callCurrentRideService() {
 
         final JSONObject object=new JSONObject();
         try {
             object.put("Id",PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
 
-            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
+            Log.e(AppConstants.DEBUG_TAG, "callCurrentRideService " + object);
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -312,11 +295,15 @@ public class HomeFragment extends Fragment {
                     snackbar.show();
                 } else {
                     PrefUtils.setCurrentRideList(rideResponse, getActivity());
-                    FragmentManager fragmentManager = getFragmentManager();
+                    alCurrentRidesVp.clear();
+                    alCurrentRidesVp.addAll(PrefUtils.getCurrentRideList(getActivity()).getAlUpcomingRides());
+                    vpCurrentRideAdapter.notifyDataSetChanged();
+
+                    /*FragmentManager fragmentManager = getFragmentManager();
                     HomeFragment currentFragment = (HomeFragment) fragmentManager.findFragmentByTag("home_fragment");
                     currentFragment.lvCustomerCall.setVisibility(View.VISIBLE);
                     rideResponse=PrefUtils.getCurrentRideList(getActivity());
-                    currentOrder=rideResponse.getAlUpcomingRides().get(0);
+                    currentOrder=rideResponse.getAlUpcomingRides().get(0);*/
                 }
             }
 
@@ -429,11 +416,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        vpCurrentRideAdapter = new VpCurrentRideAdapter(getActivity(),alCurrentRidesVp);
 
         cvCurrentRideDetails = (CardView) view.findViewById(R.id.cvCurrentRideDetails);
         pager=(BottomViewPager)view.findViewById(R.id.pager);
-        pager.setAdapter(new SampleAdapter(getActivity()));
-        pager.setOffscreenPageLimit(3);
+        pager.setAdapter(vpCurrentRideAdapter);
+        pager.setOffscreenPageLimit(alCurrentRidesVp.size());
         int margin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30*2,     getResources().getDisplayMetrics());
         pager.setPageMargin(-margin);
         pager.setPadding(30, 0, 30, 0);
@@ -477,16 +465,18 @@ public class HomeFragment extends Fragment {
    * Inspired by
    * https://gist.github.com/8cbe094bb7a783e37ad1
    */
-    private class SampleAdapter extends PagerAdapter{
+    private class VpCurrentRideAdapter extends PagerAdapter{
 
         Context context;
         LayoutInflater inflater;
         Animation animDown;
         Animation animUp;
         boolean isUpEnded;
+        ArrayList<Order> alCurrentRides;
 
-        SampleAdapter(Context context){
+        VpCurrentRideAdapter(Context context, ArrayList<Order> alCurrentRides){
 
+            this.alCurrentRides = alCurrentRides;
             this.context = context;
             inflater =  LayoutInflater.from(context);
             animDown = AnimationUtils.loadAnimation(context,R.anim.slidedown);
@@ -528,6 +518,8 @@ public class HomeFragment extends Fragment {
         public Object instantiateItem(ViewGroup container, int position) {
 
             final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
+            ((TextView)page.findViewById(R.id.tvSrcValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
+            ((TextView)page.findViewById(R.id.tvDesValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
 
             final TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
             tvAccept.setOnClickListener(new View.OnClickListener() {
@@ -583,7 +575,7 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return(3);
+            return(alCurrentRides.size());
         }
 
         /*@Override
