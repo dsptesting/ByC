@@ -108,7 +108,7 @@ public class PrefUtils {
         return notificationList;
     }
 
-<<<<<<< Updated upstream
+
     public static void setServiceRunningInBackground(boolean serviceRunningInBackground, Context ctx){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         SharedPreferences.Editor editor = preferences.edit();
@@ -123,7 +123,7 @@ public class PrefUtils {
     }
 
 
-=======
+
 
 
     public static void setTicketInfo(Ticket notificationList, Context ctx){
@@ -143,5 +143,5 @@ public class PrefUtils {
         Ticket notificationList = complexPreferences.getObject("ticket_value_pref", Ticket.class);
         return notificationList;
     }
->>>>>>> Stashed changes
+
 }
