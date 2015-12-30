@@ -44,6 +44,7 @@ import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
+import com.nap.bycab.models.Ticket;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.BottomViewPager;
 import com.nap.bycab.util.PostServiceCall;
@@ -83,6 +84,8 @@ public class HomeFragment extends Fragment {
     private SwitchCompat switchWait;
     private long mLastStopTime;
     private VpCurrentRideAdapter vpCurrentRideAdapter;
+
+    public double finalDistance;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -157,14 +160,15 @@ public class HomeFragment extends Fragment {
                     ((MainActivity)getActivity()).myService.canRecordDistance(false);
                     PrefUtils.setServiceRunningInBackground(false, getActivity());
                     ((MainActivity)getActivity()).myService.completeNotification();
-
                     Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
-
                     etTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.stop();
 
                     Intent i=new Intent(getActivity(), FairActivity.class);
                     startActivity(i);
+
+
+
                 }
                 else
                 {
@@ -457,7 +461,7 @@ public class HomeFragment extends Fragment {
 
         DecimalFormat df = new DecimalFormat("0.000");
         System.out.println(df.format(distance));
-
+        finalDistance=distance;
         if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
     }
 

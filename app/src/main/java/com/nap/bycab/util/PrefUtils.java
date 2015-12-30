@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.models.RideResponse;
+import com.nap.bycab.models.Ticket;
 
 public class PrefUtils {
 
@@ -107,6 +108,7 @@ public class PrefUtils {
         return notificationList;
     }
 
+<<<<<<< Updated upstream
     public static void setServiceRunningInBackground(boolean serviceRunningInBackground, Context ctx){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         SharedPreferences.Editor editor = preferences.edit();
@@ -121,4 +123,25 @@ public class PrefUtils {
     }
 
 
+=======
+
+
+    public static void setTicketInfo(Ticket notificationList, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "ticket_pref", 0);
+        complexPreferences.putObject("ticket_value_pref", notificationList);
+        complexPreferences.commit();
+    }
+
+    public static void clearTicketInfo( Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "ticket_pref", 0);
+        complexPreferences.clearObject();
+        complexPreferences.commit();
+    }
+
+    public static Ticket getTicketInfo(Context ctx) {
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "ticket_pref", 0);
+        Ticket notificationList = complexPreferences.getObject("ticket_value_pref", Ticket.class);
+        return notificationList;
+    }
+>>>>>>> Stashed changes
 }
