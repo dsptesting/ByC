@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -58,7 +59,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
     public LocationBackgroundService() {
 
-        Log.v(AppConstants.DEBUG_TAG,"SERVICE LocationBackgroundService");
+        Log.v(AppConstants.DEBUG_TAG, "SERVICE LocationBackgroundService");
         distanceCalculator = new DistanceCalculator();
     }
 
@@ -111,6 +112,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         intent.putExtra("isNotificationLocation", true);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 6, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mBuilder = new NotificationCompat.Builder(LocationBackgroundService.this);
         mBuilder.setContentTitle("byKab is running")
@@ -152,6 +154,8 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     /** calculates the distance between two locations in meters */
     private float compareLocation(double lat1, double lng1, double lat2, double lng2) {
 
+        Log.e(AppConstants.DEBUG_TAG,""+lat1+","+lng1+" "+lat2+","+lng2);
+
         double earthRadius = 6371000; //meters
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
@@ -168,24 +172,29 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public void onLocationChanged(Location location) {
 
-        mCurrentLocation = location;
-        BigDecimal num = new BigDecimal(compareLocation(prevLocation.getLatitude(),prevLocation.getLongitude(),location.getLatitude(),location.getLongitude()));
-        String numWithNoExponents = num.toPlainString();
+        if(prevLocation != null){
+            BigDecimal num = new BigDecimal(compareLocation(prevLocation.getLatitude(),prevLocation.getLongitude(),location.getLatitude(),location.getLongitude()));
+            String numWithNoExponents = num.toPlainString();
 
-        Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
-        Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
-        if(recordDistance && num.floatValue() > 1){
+            Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
+            Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
+            if(recordDistance && num.floatValue() > 10){
 
-            distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
+                distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
 
 
-            Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
+                Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
 
+                prevLocation = location;
+                serviceCallback.updateDistance(distance);
+            }
+        }
+        else{
             prevLocation = location;
-            serviceCallback.updateDistance(distance);
         }
 
 
+        mCurrentLocation = location;
         double latitude = mCurrentLocation.getLatitude();
         double longitude = mCurrentLocation.getLongitude();
 
@@ -223,7 +232,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         if (mCurrentLocation == null) {
             try {
                 mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                prevLocation = mCurrentLocation;
+                //prevLocation = mCurrentLocation;
                 final double latitude = mCurrentLocation.getLatitude();
                 final double longitude = mCurrentLocation.getLongitude();
                 new CountDownTimer(2000, 1000) {
