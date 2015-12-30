@@ -9,13 +9,13 @@ public class Ticket {
 
     private String mobileNumber;
 
-    private String waitTime;
+    private long waitTime;
 
-    private String durationTime;
+    private long durationTime;
 
-    private String distance;
+    private double distance;
 
-    public Ticket(String userName, String mobileNumber, String waitTime, String durationTime, String distance) {
+    public Ticket(String userName, String mobileNumber, long waitTime, long durationTime, double distance) {
         this.userName = userName;
         this.mobileNumber = mobileNumber;
         this.waitTime = waitTime;
@@ -39,27 +39,27 @@ public class Ticket {
         this.mobileNumber = mobileNumber;
     }
 
-    public String getWaitTime() {
+    public long getWaitTime() {
         return waitTime;
     }
 
-    public void setWaitTime(String waitTime) {
+    public void setWaitTime(long waitTime) {
         this.waitTime = waitTime;
     }
 
-    public String getDurationTime() {
+    public long getDurationTime() {
         return durationTime;
     }
 
-    public void setDurationTime(String durationTime) {
+    public void setDurationTime(long durationTime) {
         this.durationTime = durationTime;
     }
 
-    public String getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 }

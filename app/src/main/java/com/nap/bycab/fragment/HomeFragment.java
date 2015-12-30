@@ -175,10 +175,10 @@ public class HomeFragment extends Fragment {
 
 
                     if(switchWait.isChecked()){
-                        ticket=new Ticket(driver.getName(),driver.getMobileNo(),(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+"",(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+"",finalDistance+"");
+                        ticket=new Ticket(driver.getName(),driver.getMobileNo(),(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
                         Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
                     } else {
-                        ticket =new Ticket(driver.getName(),driver.getMobileNo(),(mLastStopTime-etWaitTimeVal.getBase())/1000+"",(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+"",finalDistance+"");
+                        ticket =new Ticket(driver.getName(),driver.getMobileNo(),(mLastStopTime-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
                         Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(mLastStopTime-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
                     }
 
@@ -485,7 +485,7 @@ public class HomeFragment extends Fragment {
 
     public void updateHomeFragmentDistance(double distance) {
 
-        DecimalFormat df = new DecimalFormat("0.000");
+        DecimalFormat df = new DecimalFormat("0.00");
         System.out.println(df.format(distance));
         finalDistance=distance;
         if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
