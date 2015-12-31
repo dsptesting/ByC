@@ -55,7 +55,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class HomeFragment extends Fragment {
 
@@ -206,13 +209,29 @@ public class HomeFragment extends Fragment {
 
         final JSONObject object=new JSONObject();
         try {
-            object.put("FromDate","2015-12-31 11:10:19");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentDateandTime = sdf.format(new Date());
+
+            Date date = sdf.parse(currentDateandTime);
+            Calendar futureTime = Calendar.getInstance();
+            futureTime.setTime(date);
+            futureTime.add(Calendar.MINUTE, 45);
+
+
+
+            Calendar pastTime = Calendar.getInstance();
+            pastTime.setTime(date);
+            pastTime.add(Calendar.MINUTE, -45);
+
+
+
+            object.put("FromDate",sdf.format(pastTime.getTime()));
             object.put("Id",PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
-            object.put("ToDate","2015-12-31 12:00:19");
+            object.put("ToDate",sdf.format(futureTime.getTime()));
 
             Log.e(AppConstants.DEBUG_TAG, "callCurrentRideService " + object);
         }
-        catch (JSONException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
 

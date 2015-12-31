@@ -78,10 +78,7 @@ public class FairActivity extends BaseActivity {
     tvFairValue.setText("Total Rs." + df.format(totalAmount));
             Log.e("fianl total", totalAmount + "");
 }
-
-
     }
-
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_fair;

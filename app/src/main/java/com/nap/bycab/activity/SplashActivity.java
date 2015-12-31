@@ -23,6 +23,9 @@ import com.nap.bycab.models.NotificationList;
 import com.nap.bycab.util.PrefUtils;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class SplashActivity extends AppCompatActivity {
@@ -37,6 +40,14 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+
+        try {
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
         initUi();
         try {
