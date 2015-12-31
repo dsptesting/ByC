@@ -29,7 +29,7 @@ public class FairActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        PrefUtils.setRunningRide(null,this);
+        PrefUtils.clearRunningRide(FairActivity.this);
 
         ticket= PrefUtils.getTicketInfo(FairActivity.this);
         isPickupDropoff=true;
