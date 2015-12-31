@@ -274,58 +274,20 @@ public class HomeFragment extends Fragment {
 
     }
 
-    private void updateOrderService(int statusCode) {
+
+
+    private void callStatusService(boolean isAccept) {
 
         final JSONObject object=new JSONObject();
         try {
-            object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
+            object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId() + "");
             object.put("OrderId", "" + PrefUtils.getRunningRide(getActivity()).getOrderId());
-            object.put("Status",statusCode);
-            Log.e(AppConstants.DEBUG_TAG, "updateOrderService " + object);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        final ProgressDialog progressDialog=new ProgressDialog(getActivity());
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        new PostServiceCall(AppConstants.UPDATE_ORDER_STATUS,object){
-
-            @Override
-            public void response(String response) {
-                progressDialog.dismiss();
-                Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
-                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
-
-                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
-                    Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
-                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-                    snackbar.show();
-
-                } else {
-                    Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
-                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-                    snackbar.show();
-                   // tvAccept.setText("Stop");
-
-                }
+            if(isAccept) {
+                object.put("Status", AppConstants.ORDER_STATUS_ACCEPT);
+            } else {
+                object.put("Status", AppConstants.    ORDER_STATUS_DRIVING);
             }
 
-            @Override
-            public void error(String error) {
-                progressDialog.dismiss();
-            }
-        }.call();
-    }
-
-    private void callAcceptService() {
-
-        final JSONObject object=new JSONObject();
-        try {
-            object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
-            object.put("OrderId",""+PrefUtils.getRunningRide(getActivity()).getOrderId());
-            object.put("Status","4");
             Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
         }
         catch (JSONException e) {
@@ -486,8 +448,8 @@ public class HomeFragment extends Fragment {
 
                 if (isStarted) {
                     //stop button operation
-                    //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
-                    tvStartStop.setText("DONE");
+
+
 
                     ((MainActivity) getActivity()).myService.canRecordDistance(false);
                     PrefUtils.setServiceRunningInBackground(false, getActivity());
@@ -522,11 +484,14 @@ public class HomeFragment extends Fragment {
 //                    Toast.makeText(getActivity(), "time " +ticket.getWaitTime()+ " seconds \n wait time " +ticket.getDurationTime()+ " seconds", Toast.LENGTH_LONG).show();
 
                     PrefUtils.setTicketInfo(ticket, getActivity());
+
                     Intent i = new Intent(getActivity(), FairActivity.class);
                     startActivity(i);
 
                 } else {
 
+                    //call start service
+                    callStatusService(false);
                     etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.start();
@@ -580,6 +545,8 @@ public class HomeFragment extends Fragment {
         });*/
         //TODO set this ((Chronometer) cvCurrentRideDetails.findViewById(R.id.etWaitTimeVal)).set...
     }
+
+
 
     private class VpCurrentRideAdapter extends PagerAdapter{
 
@@ -652,7 +619,7 @@ public class HomeFragment extends Fragment {
                         //accept button operation
                         //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
                         //tvAccept.setText("START");
-
+                        callStatusService(true);
 
                     }
 
