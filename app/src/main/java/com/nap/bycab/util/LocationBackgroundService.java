@@ -47,10 +47,8 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     private double distance = 0;
     int notif_id = 16;
     private ServiceCallback serviceCallback;
-
     private NotificationManager mNotifyManager;
     private NotificationCompat.Builder mBuilder;
-
     protected GoogleApiClient mGoogleApiClient;
     protected Boolean mRequestingLocationUpdates;
     protected Location mCurrentLocation;

@@ -437,7 +437,7 @@ public class HomeFragment extends Fragment {
         ((TextView) cvCurrentRideDetails.findViewById(R.id.etNameVal)).setText("" +order.getCustName());
         ((TextView) cvCurrentRideDetails.findViewById(R.id.etPhoneVal)).setText("" +order.getCustMobile());
         //TODO set this ((Chronometer) cvCurrentRideDetails.findViewById(R.id.etTimeVal)).set...
-        ((TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal)).setText("" +order.getKM());
+        ((TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal)).setText("0 Km");
 
         etKmVal= (TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal);
         tvStartStop= (TextView) cvCurrentRideDetails.findViewById(R.id.tvStartStop);
