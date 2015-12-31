@@ -102,9 +102,10 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         recordDistance = b;
     }
 
-    public void getTimerValues() {
-        timer.getTime(); // like this...
+    public long getTimerValues() {
+        // like this...
         //TODO return time values with some logic...
+        return  timer.getTime();
     }
 
     public class MyBinder extends Binder {

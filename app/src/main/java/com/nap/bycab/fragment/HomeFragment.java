@@ -209,7 +209,7 @@ public class HomeFragment extends Fragment {
 
         final JSONObject object=new JSONObject();
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             String currentDateandTime = sdf.format(new Date());
 
             Date date = sdf.parse(currentDateandTime);
@@ -421,13 +421,13 @@ public class HomeFragment extends Fragment {
     public void loadRunningRide() {
 
         if(PrefUtils.getRunningRide(getActivity()) != null){
-
+            long time=((MainActivity) getActivity()).myService.getTimerValues();
+            Log.e("time",time+"");
+            Toast.makeText(getActivity(),time+"",Toast.LENGTH_LONG).show();
             pager.setVisibility(View.INVISIBLE);
             cvCurrentRideDetails.setVisibility(View.VISIBLE);
-
             loadRunningRideData();
         }
-
     }
 
     private void loadRunningRideData() {
