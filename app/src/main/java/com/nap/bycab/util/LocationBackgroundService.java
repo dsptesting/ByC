@@ -95,12 +95,17 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.v(AppConstants.DEBUG_TAG,"SERVICE onStartCommand");
+        Log.v(AppConstants.DEBUG_TAG, "SERVICE onStartCommand");
         return START_STICKY;
     }
 
     public void canRecordDistance(boolean b) {
         recordDistance = b;
+    }
+
+    public void getTimerValues() {
+        timer.getTime(); // like this...
+        //TODO return time values with some logic...
     }
 
     public class MyBinder extends Binder {
