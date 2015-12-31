@@ -37,6 +37,8 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Palak on 27-12-2015.
@@ -89,6 +91,8 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             }
         }.start();
+
+
     }
 
     @Override
@@ -105,7 +109,16 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     public long getTimerValues() {
         // like this...
         //TODO return time values with some logic...
-        return  timer.getTime();
+
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Log.e("service calling","hi nirav");
+//            }
+//        }, 0, 1000);
+
+
+        return  timer.getSplitTime();
     }
 
     public class MyBinder extends Binder {
