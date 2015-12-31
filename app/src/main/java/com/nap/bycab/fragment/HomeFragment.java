@@ -93,6 +93,7 @@ public class HomeFragment extends Fragment {
     public double finalDistance;
     private Driver driver;
     Ticket ticket;
+    public  static boolean isFromFairActivity=false;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -166,9 +167,9 @@ public class HomeFragment extends Fragment {
         tvGPS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("gps...","clicked");
+                Log.e("gps...", "clicked");
                 Location mCurrentLocation = ((MainActivity) getActivity()).myService.getCurrentLocation();
-                if(mCurrentLocation != null){
+                if (mCurrentLocation != null) {
                     double latitude = mCurrentLocation.getLatitude();
                     double longitude = mCurrentLocation.getLongitude();
                     try {
@@ -177,7 +178,7 @@ public class HomeFragment extends Fragment {
                         HomeFragment.map.clear();
 
                         HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
-                   //     Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+                        //     Toast.makeText(getActivity(), mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
 //            callLocationUpdate();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -273,6 +274,7 @@ public class HomeFragment extends Fragment {
         }.call();
 
     }
+
 
 
 
@@ -448,7 +450,6 @@ public class HomeFragment extends Fragment {
 
                 if (isStarted) {
                     //stop button operation
-
 
 
                     ((MainActivity) getActivity()).myService.canRecordDistance(false);
@@ -658,6 +659,10 @@ public class HomeFragment extends Fragment {
 
         if(mapView != null) mapView.onResume();
         super.onResume();
+
+        if(isFromFairActivity) {
+            cvCurrentRideDetails.setVisibility(View.INVISIBLE);
+        }
         try {
             Location mCurrentLocation = ((MainActivity) getActivity()).myService.getCurrentLocation();
             if (mCurrentLocation != null) {

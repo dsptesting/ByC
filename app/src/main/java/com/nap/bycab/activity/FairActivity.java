@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
+import com.nap.bycab.fragment.HomeFragment;
 import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.Ticket;
@@ -39,9 +40,7 @@ public class FairActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
+        HomeFragment.isFromFairActivity=true;
         ticket= PrefUtils.getTicketInfo(FairActivity.this);
         isPickupDropoff=true;
         tvCustomerNameVal= (TextView) findViewById(R.id.tvCustomerNameVal);
@@ -164,5 +163,6 @@ public class FairActivity extends BaseActivity {
             }
         }.call();
     }
+
 
 }
