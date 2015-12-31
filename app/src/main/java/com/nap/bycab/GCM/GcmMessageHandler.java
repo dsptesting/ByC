@@ -96,12 +96,17 @@ public class GcmMessageHandler extends IntentService {
         if(PrefUtils.getUpcomingNotificationIdList(this) == null) PrefUtils.setUpcomingNotificationIdList(new NotificationList(), this);
         if(PrefUtils.getCurrentNotificationIdList(this) == null) PrefUtils.setCurrentNotificationIdList(new NotificationList(), this);
 
+        boolean IsCurrentRide = Boolean.parseBoolean(response.getString("IsCurrentRide"));
+
+        //TODO...remove this...
+        IsCurrentRide = true;
+
         if(Boolean.parseBoolean(response.getString("IsOrderCompleted"))){
 
             // Order completed... handler it.
             Log.v(AppConstants.DEBUG_TAG, "Order completed Noti Id: " + m);
         }
-        else if(!Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+        else if(!IsCurrentRide){
 
             // upcoming ride..
             Log.v(AppConstants.DEBUG_TAG, "upcoming ride Noti Id: " + m);
@@ -111,7 +116,7 @@ public class GcmMessageHandler extends IntentService {
            // Log.v(AppConstants.DEBUG_TAG, "nnn u notificationList: " + notificationList.getIdList());
             PrefUtils.setUpcomingNotificationIdList(notificationList,this);
         }
-        else if(Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+        else if(IsCurrentRide){
 
             // current ride...
             Log.v(AppConstants.DEBUG_TAG, "current ride Noti Id: " + m);
@@ -128,9 +133,9 @@ public class GcmMessageHandler extends IntentService {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
-        intent.putExtra("IsCurrentRide", Boolean.parseBoolean(response.getString("IsCurrentRide")));
+        intent.putExtra("IsCurrentRide", IsCurrentRide);
         intent.putExtra("isNotificationLocation", false);
-        if(Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+        if(IsCurrentRide){
             intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_CURRENT_RIDE);
         }
         else{
