@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.media.RingtoneManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -134,9 +135,12 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         mBuilder = new NotificationCompat.Builder(LocationBackgroundService.this);
         mBuilder.setContentIntent(contentIntent)
                 .setContentTitle("ByKab is running..")
-                .setSubText("Your counter is ticking")
+                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText("Your counter is ticking"))
+                .setContentText("Your counter is ticking")
                 .setSmallIcon(R.drawable.common_signin_btn_icon_disabled_dark)
-                .setUsesChronometer(true);
+                .setUsesChronometer(true)
+                .setVibrate(new long[]{1000})
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
 
         timer.start();
 

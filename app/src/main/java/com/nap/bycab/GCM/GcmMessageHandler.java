@@ -10,6 +10,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -143,13 +144,15 @@ public class GcmMessageHandler extends IntentService {
         }
         intent.putExtra("notification_id", m);
         intent.setAction(""+m);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GcmMessageHandler.this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(response.getString("contentTitle").toString())
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
                         .setContentText(response.getString("message").toString()+", "+m)
                         .setPriority(Notification.PRIORITY_MAX)
+                        .setVibrate(new long[] { 1000 })
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setOngoing(true);
 
         mBuilder.setContentIntent(contentIntent);
