@@ -101,6 +101,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private Intent serviceIntent;
     public LocationBackgroundService myService;
     private boolean userWantsToExit;
+    private int notificationType;
     private boolean cancelStopNotification;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -128,7 +129,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         super.onCreate(savedInstanceState);
 
         isInternetAvailable=isInternetAvailable();
-
 
         driver=PrefUtils.getCurrentDriver(MainActivity.this);
 
@@ -218,23 +218,41 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void handleNotification(Intent intent){
 
+        notificationType = intent.getIntExtra("notificationType", -1);
         isNotificationLocation = intent.getBooleanExtra("isNotificationLocation", false);
         isForCurrentRide = intent.getBooleanExtra("IsCurrentRide", false);
 
-        isForCurrentRide = true;
+        // TODO ... testing.. once webcall returns perfect data, remove this line..
+         isForCurrentRide = true;
+        if(notificationType == AppConstants.NOTIFICATION_TYPE_UPCOMING_RIDE){
+            notificationType = AppConstants.NOTIFICATION_TYPE_CURRENT_RIDE;
+        }
+        //TODO.. above stuff is temp..
 
         Log.v(AppConstants.DEBUG_TAG, "Noti Id: " + intent.getIntExtra("notification_id", 0));
 
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Log.v(AppConstants.DEBUG_TAG, "isNotificationLocation " + isNotificationLocation);
-        if(isNotificationLocation){
+        Log.v(AppConstants.DEBUG_TAG, "notificationType " + notificationType);
+
+        if(notificationType == AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING){
 
             // handle direct implementation of current ride popup
             cancelStopNotification = true;
 
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.v(AppConstants.DEBUG_TAG, "l fragment  " + homeFragment);
+
+                    if (homeFragment != null) homeFragment.loadRunningRide();
+
+                    PrefUtils.clearCurrentNotificationIdList(MainActivity.this);
+                }
+            }, 500);
         }
-        else if(isForCurrentRide){
+        else if(notificationType == AppConstants.NOTIFICATION_TYPE_CURRENT_RIDE){
 
             cancelStopNotification = false;
             NotificationList notificationList = PrefUtils.getCurrentNotificationIdList(this);
@@ -257,11 +275,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                         PrefUtils.clearCurrentNotificationIdList(MainActivity.this);
                     }
-                }, 3000);
+                }, 1000);
 
             }
         }
-        else if(!isForCurrentRide){
+        else if(notificationType == AppConstants.NOTIFICATION_TYPE_UPCOMING_RIDE){
 
             cancelStopNotification = false;
             NotificationList notificationList = PrefUtils.getUpcomingNotificationIdList(this);
@@ -272,12 +290,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     Log.v(AppConstants.DEBUG_TAG, "clear u Noti Id: " + notificationList.getIdList().get(i));
                     notificationManager.cancel(notificationList.getIdList().get(i));
                 }
-
-                //call upcoming.. ride webserivce..
-                //TODO .. remove this call... its only for currentRide.. but notification doesnt conatin.. isForCurrentRide true.. so, it comes to execute this block.. only for testing..
-
-                Log.v(AppConstants.DEBUG_TAG, "u fragment  " + homeFragment);
-                if(homeFragment != null)homeFragment.callCurrentRideService();
 
                 PrefUtils.clearUpcomingNotificationIdList(this);
             }

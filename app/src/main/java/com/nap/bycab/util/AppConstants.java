@@ -37,4 +37,8 @@ public class AppConstants {
     public static final int ORDER_STATUS_CANCEL = 3;
     public static final int ORDER_STATUS_ACCEPT = 4;
 
+    public static final int NOTIFICATION_TYPE_CURRENT_RIDE = 0;
+    public static final int NOTIFICATION_TYPE_UPCOMING_RIDE = 1;
+    public static final int NOTIFICATION_TYPE_LOCATION_COUNTING = 2;
+
 }

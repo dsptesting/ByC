@@ -130,6 +130,12 @@ public class GcmMessageHandler extends IntentService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);   // To open only one activity on launch.
         intent.putExtra("IsCurrentRide", Boolean.parseBoolean(response.getString("IsCurrentRide")));
         intent.putExtra("isNotificationLocation", false);
+        if(Boolean.parseBoolean(response.getString("IsCurrentRide"))){
+            intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_CURRENT_RIDE);
+        }
+        else{
+            intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_UPCOMING_RIDE);
+        }
         intent.putExtra("notification_id", m);
         intent.setAction(""+m);
         PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_CANCEL_CURRENT);

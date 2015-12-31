@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff">
+
+    <ImageView
+        android:id="@+id/imagenotileft"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/marker" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@+id/imagenotileft"
+        android:orientation="vertical">
+
+        <Chronometer
+            android:id="@+id/etTimeVal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="00.00"
+            android:textColor="#333"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="asd"
+            android:textColor="#333"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:textColor="#333"
+            android:layout_height="wrap_content"
+            android:text="refg"
+            />
+    </LinearLayout>
+
+
+</RelativeLayout>

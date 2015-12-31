@@ -78,7 +78,6 @@ public class HomeFragment extends Fragment {
     public LinearLayout lvCustomerCall;
     private RideResponse rideResponse;
     private RelativeLayout rootLayout;
-    private Order currentOrder;
     private TextView tvStartStop;
     private TextView etKmVal;
     private Chronometer etWaitTimeVal,etTimeVal;
@@ -119,101 +118,8 @@ public class HomeFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
         tvGPS= (ImageView) view.findViewById(R.id.imgGPS);
-        etKmVal= (TextView) view.findViewById(R.id.etKmVal);
-        tvStartStop= (TextView) view.findViewById(R.id.tvStartStop);
+
         driver=PrefUtils.getCurrentDriver(getActivity());
-
-        etTimeVal= (Chronometer) view.findViewById(R.id.etTimeVal);
-        etWaitTimeVal= (Chronometer) view.findViewById(R.id.etWaitTimeVal);
-
-
-        switchWait= (SwitchCompat) view.findViewById(R.id.switchWait);
-        switchWait.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // on first start
-                    if (mLastStopTime == 0)
-                        etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
-                        // on resume after pause
-                    else {
-                        long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
-                        etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
-                    }
-
-
-                    etWaitTimeVal.start();
-                } else {
-
-                    etWaitTimeVal.stop();
-                    mLastStopTime = SystemClock.elapsedRealtime();
-                }
-            }
-        });
-
-        tvStartStop.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                if(isStarted){
-                    //stop button operation
-                    //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
-                    tvStartStop.setText("DONE");
-
-                    ((MainActivity)getActivity()).myService.canRecordDistance(false);
-                    PrefUtils.setServiceRunningInBackground(false, getActivity());
-                    ((MainActivity)getActivity()).myService.completeNotification();
-//                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
-//                    etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
-
-                    try {
-                        PrefUtils.clearCurrentDriver(getActivity());
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
-
-
-                    if(switchWait.isChecked()){
-                        ticket=new Ticket(driver.getName(),driver.getMobileNo(),(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
-                        Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
-                    } else {
-                        ticket =new Ticket(driver.getName(),driver.getMobileNo(),(mLastStopTime-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
-                        Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(mLastStopTime-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
-                    }
-
-                    etTimeVal.setBase(SystemClock.elapsedRealtime());
-                    etTimeVal.stop();
-
-//                    Intent i=new Intent(getActivity(), FairActivity.class);
-//                    startActivity(i);
-
-
-//                    Toast.makeText(getActivity(), "time " +ticket.getWaitTime()+ " seconds \n wait time " +ticket.getDurationTime()+ " seconds", Toast.LENGTH_LONG).show();
-
-                    PrefUtils.setTicketInfo(ticket,getActivity());
-                    Intent i=new Intent(getActivity(), FairActivity.class);
-                    startActivity(i);
-
-                }
-                else
-                {
-
-                    etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
-                    etTimeVal.setBase(SystemClock.elapsedRealtime());
-                    etTimeVal.start();
-                    isStarted=true;
-                    //start button operation
-                    //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
-                    //callStartService();
-
-                    tvStartStop.setText("STOP");
-                    ((MainActivity)getActivity()).myService.canRecordDistance(true);
-                    PrefUtils.setServiceRunningInBackground(true, getActivity());
-                    ((MainActivity)getActivity()).myService.createNotification();
-                }
-            }
-        });
 
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
@@ -300,7 +206,9 @@ public class HomeFragment extends Fragment {
 
         final JSONObject object=new JSONObject();
         try {
+            object.put("FromDate","2015-12-31 11:10:19");
             object.put("Id",PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
+            object.put("ToDate","2015-12-31 12:00:19");
 
             Log.e(AppConstants.DEBUG_TAG, "callCurrentRideService " + object);
         }
@@ -350,7 +258,7 @@ public class HomeFragment extends Fragment {
         final JSONObject object=new JSONObject();
         try {
             object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
-            object.put("OrderId",""+currentOrder.getOrderId());
+            object.put("OrderId", "" + PrefUtils.getRunningRide(getActivity()).getOrderId());
             object.put("Status",statusCode);
             Log.e(AppConstants.DEBUG_TAG, "updateOrderService " + object);
         }
@@ -491,10 +399,158 @@ public class HomeFragment extends Fragment {
         if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
     }
 
-    /*
-   * Inspired by
-   * https://gist.github.com/8cbe094bb7a783e37ad1
-   */
+    public void loadRunningRide() {
+
+        if(PrefUtils.getRunningRide(getActivity()) != null){
+
+            pager.setVisibility(View.INVISIBLE);
+            cvCurrentRideDetails.setVisibility(View.VISIBLE);
+
+            loadRunningRideData();
+        }
+
+    }
+
+    private void loadRunningRideData() {
+
+        Order order= PrefUtils.getRunningRide(getActivity());
+
+        ((TextView) cvCurrentRideDetails.findViewById(R.id.etNameVal)).setText("" +order.getCustName());
+        ((TextView) cvCurrentRideDetails.findViewById(R.id.etPhoneVal)).setText("" +order.getCustMobile());
+        //TODO set this ((Chronometer) cvCurrentRideDetails.findViewById(R.id.etTimeVal)).set...
+        ((TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal)).setText("" +order.getKM());
+
+        etKmVal= (TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal);
+        tvStartStop= (TextView) cvCurrentRideDetails.findViewById(R.id.tvStartStop);
+        etTimeVal= (Chronometer) cvCurrentRideDetails.findViewById(R.id.etTimeVal);
+        etWaitTimeVal= (Chronometer) cvCurrentRideDetails.findViewById(R.id.etWaitTimeVal);
+
+        switchWait= (SwitchCompat) cvCurrentRideDetails.findViewById(R.id.switchWait);
+        switchWait.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // on first start
+                    if (mLastStopTime == 0)
+                        etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
+                        // on resume after pause
+                    else {
+                        long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+                        etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
+                    }
+
+
+                    etWaitTimeVal.start();
+                } else {
+
+                    etWaitTimeVal.stop();
+                    mLastStopTime = SystemClock.elapsedRealtime();
+                }
+            }
+        });
+
+        tvStartStop.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                if (isStarted) {
+                    //stop button operation
+                    //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
+                    tvStartStop.setText("DONE");
+
+                    ((MainActivity) getActivity()).myService.canRecordDistance(false);
+                    PrefUtils.setServiceRunningInBackground(false, getActivity());
+                    ((MainActivity) getActivity()).myService.completeNotification();
+//                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+//                    etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
+
+                    // TODO.. suspicious code below commented..
+                /*
+                    try {
+                        PrefUtils.clearCurrentDriver(getActivity());
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                  */
+
+                    if (switchWait.isChecked()) {
+                        ticket = new Ticket(driver.getName(), driver.getMobileNo(), (SystemClock.elapsedRealtime() - etWaitTimeVal.getBase()) / 1000, (SystemClock.elapsedRealtime() - etTimeVal.getBase()) / 1000, finalDistance);
+                        Toast.makeText(getActivity(), "time " + (SystemClock.elapsedRealtime() - etTimeVal.getBase()) / 1000 + " seconds \n wait time " + (SystemClock.elapsedRealtime() - etWaitTimeVal.getBase()) / 1000 + " seconds", Toast.LENGTH_LONG).show();
+                    } else {
+                        ticket = new Ticket(driver.getName(), driver.getMobileNo(), (mLastStopTime - etWaitTimeVal.getBase()) / 1000, (SystemClock.elapsedRealtime() - etTimeVal.getBase()) / 1000, finalDistance);
+                        Toast.makeText(getActivity(), "time " + (SystemClock.elapsedRealtime() - etTimeVal.getBase()) / 1000 + " seconds \n wait time " + (mLastStopTime - etWaitTimeVal.getBase()) / 1000 + " seconds", Toast.LENGTH_LONG).show();
+                    }
+
+                    etTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.stop();
+
+//                    Intent i=new Intent(getActivity(), FairActivity.class);
+//                    startActivity(i);
+
+
+//                    Toast.makeText(getActivity(), "time " +ticket.getWaitTime()+ " seconds \n wait time " +ticket.getDurationTime()+ " seconds", Toast.LENGTH_LONG).show();
+
+                    PrefUtils.setTicketInfo(ticket, getActivity());
+                    Intent i = new Intent(getActivity(), FairActivity.class);
+                    startActivity(i);
+
+                } else {
+
+                    etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.setBase(SystemClock.elapsedRealtime());
+                    etTimeVal.start();
+                    isStarted = true;
+                    //start button operation
+                    //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
+                    //callStartService();
+
+                    tvStartStop.setText("STOP");
+                    ((MainActivity) getActivity()).myService.canRecordDistance(true);
+                    PrefUtils.setServiceRunningInBackground(true, getActivity());
+                    ((MainActivity) getActivity()).myService.createNotification(etTimeVal.getBase());
+                }
+            }
+        });
+
+        /*((TextView) cvCurrentRideDetails.findViewById(R.id.tvStartStop)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ((TextView) cvCurrentRideDetails.findViewById(R.id.tvStartStop)).setText("DONE");
+
+                ((MainActivity)getActivity()).myService.canRecordDistance(false);
+                PrefUtils.setServiceRunningInBackground(false, getActivity());
+                ((MainActivity)getActivity()).myService.completeNotification();
+//                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
+//                    etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
+
+                if(switchWait.isChecked()){
+                    ticket=new Ticket(driver.getName(),driver.getMobileNo(),(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
+                    Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(SystemClock.elapsedRealtime()-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+                }
+                else {
+                    ticket =new Ticket(driver.getName(),driver.getMobileNo(),(mLastStopTime-etWaitTimeVal.getBase())/1000,(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000,finalDistance);
+                    Toast.makeText(getActivity(),"time "+(SystemClock.elapsedRealtime()-etTimeVal.getBase())/1000+" seconds \n wait time "+(mLastStopTime-etWaitTimeVal.getBase())/1000+" seconds",Toast.LENGTH_LONG).show();
+                }
+
+                etTimeVal.setBase(SystemClock.elapsedRealtime());
+                etTimeVal.stop();
+
+//                    Intent i=new Intent(getActivity(), FairActivity.class);
+//                    startActivity(i);
+
+
+//                    Toast.makeText(getActivity(), "time " +ticket.getWaitTime()+ " seconds \n wait time " +ticket.getDurationTime()+ " seconds", Toast.LENGTH_LONG).show();
+
+                PrefUtils.setTicketInfo(ticket, getActivity());
+                Intent i=new Intent(getActivity(), FairActivity.class);
+                startActivity(i);
+            }
+        });*/
+        //TODO set this ((Chronometer) cvCurrentRideDetails.findViewById(R.id.etWaitTimeVal)).set...
+    }
+
     private class VpCurrentRideAdapter extends PagerAdapter{
 
         Context context;
@@ -520,6 +576,7 @@ public class HomeFragment extends Fragment {
                     pager.setAnimation(null);
                     pager.setVisibility(View.GONE);
                     cvCurrentRideDetails.setVisibility(View.VISIBLE);
+                    loadRunningRideData();
                     cvCurrentRideDetails.startAnimation(animUp);
                 }
 
@@ -545,11 +602,11 @@ public class HomeFragment extends Fragment {
             });
         }
         @Override
-        public Object instantiateItem(ViewGroup container, int position) {
+        public Object instantiateItem(ViewGroup container, final int position) {
 
             final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
             ((TextView)page.findViewById(R.id.tvSrcValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
-            ((TextView)page.findViewById(R.id.tvDesValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
+            ((TextView)page.findViewById(R.id.tvDesValue)).setText(""+ alCurrentRides.get(position).getDropLocation());
 
             final TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
             tvAccept.setOnClickListener(new View.OnClickListener() {
@@ -558,35 +615,13 @@ public class HomeFragment extends Fragment {
 
                     pager.startAnimation(animDown);
 
-                    /*if(isAccepted){
-
-                        if(isStarted){
-                            //stop button operation
-                            //updateOrderService(AppConstants.ORDER_STATUS_COMPLETE);
-                            tvAccept.setText("DONE");
-                        }
-                        else {
-                            isStarted=true;
-                            //start button operation
-                            //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
-                            //callStartService();
-                            tvAccept.setText("STOP");
-                        }
-                    }
-                    else {
-                        isAccepted=true;
-                        //accept button operation
-                        //callAcceptService();
-                        //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
-                        tvAccept.setText("START");
-                    }*/
-
                     if(!isAccepted){
 
+                        PrefUtils.setRunningRide(alCurrentRides.get(position),getActivity());
                         isAccepted=true;
                         //accept button operation
                         //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
-                        tvAccept.setText("START");
+                        //tvAccept.setText("START");
                     }
 
                 }

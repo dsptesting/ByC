@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 
 import com.nap.bycab.models.Driver;
 import com.nap.bycab.models.NotificationList;
+import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.models.Ticket;
 
@@ -144,4 +145,21 @@ public class PrefUtils {
         return notificationList;
     }
 
+    public static void setRunningRide(Order order, Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "order_pref", 0);
+        complexPreferences.putObject("order_value_pref", order);
+        complexPreferences.commit();
+    }
+
+    public static void clearRunningRide(Context ctx){
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "order_pref", 0);
+        complexPreferences.clearObject();
+        complexPreferences.commit();
+    }
+
+    public static Order getRunningRide(Context ctx) {
+        ComplexPreferences complexPreferences = ComplexPreferences.getComplexPreferences(ctx, "order_pref", 0);
+        Order order = complexPreferences.getObject("order_value_pref", Order.class);
+        return order;
+    }
 }

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nap.bycab.R;
+import com.nap.bycab.models.Order;
 import com.nap.bycab.models.Ticket;
 import com.nap.bycab.util.PrefUtils;
 
@@ -27,6 +28,9 @@ public class FairActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PrefUtils.setRunningRide(null,this);
+
         ticket= PrefUtils.getTicketInfo(FairActivity.this);
         isPickupDropoff=true;
         tvCustomerNameVal= (TextView) findViewById(R.id.tvCustomerNameVal);

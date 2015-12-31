@@ -10,10 +10,12 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.Chronometer;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.fragment.HomeFragment;
+import org.apache.commons.lang3.time.StopWatch;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -56,6 +59,8 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final IBinder mBinder = new MyBinder();
     private boolean recordDistance;
+    private Chronometer etTimeVal;
+    StopWatch timer = new StopWatch();
 
     public LocationBackgroundService() {
 
@@ -104,21 +109,34 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         }
     }
 
-    public void createNotification(){
+    public void createNotification(long base){
 
-        Log.v(AppConstants.DEBUG_TAG,"SERVICE createNotification");
+        Log.v(AppConstants.DEBUG_TAG, "SERVICE createNotification base:" + base);
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("isNotificationLocation", true);
+        intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 6, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long timeDifference = 0;
+        timeDifference  = base - SystemClock.elapsedRealtime();
+
+       /* RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.custom_notification_view);
+        Log.v(AppConstants.DEBUG_TAG,"noti chrono "+timeDifference + SystemClock.elapsedRealtime());
+        remoteViews.setChronometer(R.id.tvTimeLeft, timeDifference + SystemClock.elapsedRealtime(), null, true);
+        remoteViews.setTextViewText(R.id.title, " palak");*/
 
 
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mBuilder = new NotificationCompat.Builder(LocationBackgroundService.this);
-        mBuilder.setContentTitle("byKab is running")
-                .setContentText("in progress..")
-                .setSmallIcon(R.drawable.ic_about_us)
-                .addAction(0, "STOP", contentIntent);
+        mBuilder.setContentIntent(contentIntent)
+                .setContentTitle("ByKab is running..")
+                .setSubText("Your counter is ticking")
+                .setSmallIcon(R.drawable.common_signin_btn_icon_disabled_dark)
+                .setUsesChronometer(true);
+
+        timer.start();
+
 
         startForeground(notif_id, mBuilder.getNotification());
     }
@@ -299,6 +317,9 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     }
 
     public void completeNotification(){
+
+        timer.stop();
+        //TODO set timer value to prefutils running ride... and delete running ride object once u reach fair activity..
         Log.v(AppConstants.DEBUG_TAG,"SERVICE completeNotification");
         stopForeground(true);
         mBuilder.setAutoCancel(true);
