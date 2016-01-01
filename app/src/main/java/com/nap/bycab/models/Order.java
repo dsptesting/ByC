@@ -47,6 +47,23 @@ public class Order {
         Time = time;
     }
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "Amount='" + Amount + '\'' +
+                ", CustMobile='" + CustMobile + '\'' +
+                ", CustName='" + CustName + '\'' +
+                ", DropLocation='" + DropLocation + '\'' +
+                ", JournyTime='" + JournyTime + '\'' +
+                ", KM='" + KM + '\'' +
+                ", OrderDate='" + OrderDate + '\'' +
+                ", OrderId='" + OrderId + '\'' +
+                ", OrderStatus='" + OrderStatus + '\'' +
+                ", PickUpLocation='" + PickUpLocation + '\'' +
+                ", Time='" + Time + '\'' +
+                '}';
+    }
+
     public String getAmount() {
         return Amount;
     }

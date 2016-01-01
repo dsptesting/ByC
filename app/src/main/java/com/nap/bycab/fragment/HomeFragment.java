@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
@@ -79,7 +80,7 @@ public class HomeFragment extends Fragment {
     private View locationButton;
     private ImageView tvGPS,imgCall;
     private TextView tvTimeLeft,tvAccept;
-    private boolean isAccepted,isStarted;
+    private boolean isAccepted/*,isStarted*/;
     public LinearLayout lvCustomerCall;
     private RideResponse rideResponse;
     private RelativeLayout rootLayout;
@@ -94,6 +95,7 @@ public class HomeFragment extends Fragment {
     private Driver driver;
     Ticket ticket;
     public  static boolean isFromFairActivity=false;
+    private Timer timerCallCurrentRideService;
 
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
@@ -129,6 +131,20 @@ public class HomeFragment extends Fragment {
 
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
+
+        timerCallCurrentRideService = new Timer();
+        timerCallCurrentRideService.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
+
+                if (PrefUtils.getRunningRide(getActivity()) == null) {
+                    callCurrentRideService();
+                }
+
+            }
+        }, 10000, 60000);
 
         /*new CountDownTimer(3000, 1000) {
 
@@ -256,8 +272,16 @@ public class HomeFragment extends Fragment {
                 } else {
                     PrefUtils.setCurrentRideList(rideResponse, getActivity());
                     alCurrentRidesVp.clear();
-                    alCurrentRidesVp.addAll(PrefUtils.getCurrentRideList(getActivity()).getAlUpcomingRides());
-                    vpCurrentRideAdapter.notifyDataSetChanged();
+                    ArrayList<Order> temp = PrefUtils.getCurrentRideList(getActivity()).getAlUpcomingRides();
+
+                    if(temp != null){
+                        for(int i=0;i<temp.size();i++){
+                            if(temp.get(i).getOrderStatus() != null && temp.get(i).getOrderStatus().equalsIgnoreCase(""+AppConstants.ORDER_STATUS_PENDING)){
+                                alCurrentRidesVp.add(temp.get(i));
+                            }
+                        }
+                        vpCurrentRideAdapter.notifyDataSetChanged();
+                    }
 
                     /*FragmentManager fragmentManager = getFragmentManager();
                     HomeFragment currentFragment = (HomeFragment) fragmentManager.findFragmentByTag("home_fragment");
@@ -396,7 +420,7 @@ public class HomeFragment extends Fragment {
 
     private void loadRunningRideData() {
 
-        Order order= PrefUtils.getRunningRide(getActivity());
+        final Order order= PrefUtils.getRunningRide(getActivity());
 
         ((TextView) cvCurrentRideDetails.findViewById(R.id.etNameVal)).setText("" +order.getCustName());
         ((TextView) cvCurrentRideDetails.findViewById(R.id.etPhoneVal)).setText("" +order.getCustMobile());
@@ -443,12 +467,17 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        ((TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal)).setVisibility(View.INVISIBLE);
+        etTimeVal.setVisibility(View.INVISIBLE);
+        etWaitTimeVal.setVisibility(View.INVISIBLE);
+        switchWait.setVisibility(View.INVISIBLE);
+
         tvStartStop.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                if (isStarted) {
+                if (order.getOrderStatus().equalsIgnoreCase(""+AppConstants.ORDER_STATUS_DRIVING)) {
                     //stop button operation
 
 
@@ -489,19 +518,27 @@ public class HomeFragment extends Fragment {
                     Intent i = new Intent(getActivity(), FairActivity.class);
                     startActivity(i);
 
-                } else {
+                }
+                else if(order.getOrderStatus().equalsIgnoreCase(""+AppConstants.ORDER_STATUS_ACCEPT)) {
 
-                    //call start service
+                    //call start service (Start button operation)
                     callStatusService(false);
                     etWaitTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.start();
-                    isStarted = true;
+                    order.setOrderStatus(AppConstants.ORDER_STATUS_DRIVING + "");
+                    PrefUtils.setRunningRide(order,getActivity());
                     //start button operation
                     //updateOrderService(AppConstants.ORDER_STATUS_DRIVING);
                     //callStartService();
 
                     tvStartStop.setText("STOP");
+                    ((TextView) cvCurrentRideDetails.findViewById(R.id.etKmVal)).setVisibility(View.VISIBLE);
+                    etTimeVal.setVisibility(View.VISIBLE);
+                    etWaitTimeVal.setVisibility(View.VISIBLE);
+                    switchWait.setVisibility(View.VISIBLE);
+
+
                     ((MainActivity) getActivity()).myService.canRecordDistance(true);
                     PrefUtils.setServiceRunningInBackground(true, getActivity());
                     ((MainActivity) getActivity()).myService.createNotification(etTimeVal.getBase());
@@ -599,12 +636,15 @@ public class HomeFragment extends Fragment {
                 }
             });
         }
+
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
 
+            Log.v(AppConstants.DEBUG_TAG,"instantiateItem : "+alCurrentRides.get(position) + ", position: "+position);
+
             final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
             ((TextView)page.findViewById(R.id.tvSrcValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
-            ((TextView)page.findViewById(R.id.tvDesValue)).setText(""+ alCurrentRides.get(position).getDropLocation());
+            ((TextView)page.findViewById(R.id.tvDesValue)).setText("" + alCurrentRides.get(position).getDropLocation());
 
             final TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
             tvAccept.setOnClickListener(new View.OnClickListener() {
@@ -615,7 +655,9 @@ public class HomeFragment extends Fragment {
 
                     if(!isAccepted){
 
-                        PrefUtils.setRunningRide(alCurrentRides.get(position),getActivity());
+                        Order acceptedOrder = alCurrentRides.get(position);
+                        acceptedOrder.setOrderStatus(""+AppConstants.ORDER_STATUS_ACCEPT);
+                        PrefUtils.setRunningRide(acceptedOrder, getActivity());
                         isAccepted=true;
                         //accept button operation
                         //updateOrderService(AppConstants.ORDER_STATUS_ACCEPT);
@@ -642,7 +684,9 @@ public class HomeFragment extends Fragment {
         public int getCount() {
             return(alCurrentRides.size());
         }
-
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
         /*@Override
         public float getPageWidth(int position) {
             return(1f);
@@ -695,6 +739,7 @@ public class HomeFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         if(mapView != null) mapView.onDestroy();
+        if(timerCallCurrentRideService != null) timerCallCurrentRideService.cancel();
     }
 
     @Override

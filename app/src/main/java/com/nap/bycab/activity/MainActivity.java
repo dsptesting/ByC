@@ -190,8 +190,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             unbindService(serviceConnection);
         }
 
+        Log.v(AppConstants.DEBUG_TAG,"isServiceRunningInBackground : "+PrefUtils.isServiceRunningInBackground(this));
+
         if(!PrefUtils.isServiceRunningInBackground(this)){
             stopService(new Intent(MainActivity.this,LocationBackgroundService.class));
+            PrefUtils.clearRunningRide(this);
         }
         super.onDestroy();
     }
