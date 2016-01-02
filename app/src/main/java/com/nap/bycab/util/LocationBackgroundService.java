@@ -2,6 +2,7 @@ package com.nap.bycab.util;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -30,10 +32,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.fragment.HomeFragment;
+import com.nap.bycab.models.CommonResponse;
+
 import org.apache.commons.lang3.time.StopWatch;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -244,7 +251,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
            // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-//            callLocationUpdate();
+            callLocationUpdate();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -252,6 +259,53 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
     public Location getCurrentLocation(){
         return  mCurrentLocation;
+    }
+
+    private void callLocationUpdate() {
+
+        JSONObject object=new JSONObject();
+        try {
+            object.put("Id", PrefUtils.getCurrentDriver(this).getDriverId()+"");
+            object.put("Latitude",mCurrentLocation.getLatitude()+"");
+            object.put("Longitude",mCurrentLocation.getLongitude()+"");
+
+            Log.e("location update :",object+"");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        /*final ProgressDialog progressDialog=new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();*/
+        new PostServiceCall(AppConstants.UPDATE_LOCATION,object){
+
+            @Override
+            public void response(String response) {
+                //progressDialog.dismiss();
+                Log.e("login Response: ",response+"");
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Toast.makeText(getApplicationContext(),""+commonResponse.getResponseMessage(),Toast.LENGTH_SHORT).show();
+                    /*Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();*/
+
+                }  else {
+                    /*Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();*/
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                Toast.makeText(getApplicationContext(),""+error.toString(),Toast.LENGTH_SHORT).show();
+                //progressDialog.dismiss();
+            }
+        }.call();
+
+
     }
 
     @Override

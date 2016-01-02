@@ -156,8 +156,6 @@ public class FairActivity extends BaseActivity {
 
                 }
 
-                PrefUtils.clearRunningRide(FairActivity.this);
-                Log.v(AppConstants.DEBUG_TAG, "Cleared Running ride: " + PrefUtils.getRunningRide(FairActivity.this));
             }
 
             @Override
@@ -167,5 +165,11 @@ public class FairActivity extends BaseActivity {
         }.call();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        PrefUtils.clearRunningRide(FairActivity.this);
+        Log.v(AppConstants.DEBUG_TAG, "Cleared Running ride: " + PrefUtils.getRunningRide(FairActivity.this));
+    }
 }

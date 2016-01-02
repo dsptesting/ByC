@@ -157,6 +157,7 @@ public class GcmMessageHandler extends IntentService {
 
         mBuilder.setContentIntent(contentIntent);
 
-        mNotificationManager.notify(m, mBuilder.build());
+        // TODO... MIMP.. REMOVE THIS COMMENT TO ENABLE NOTIFICATION..
+        // mNotificationManager.notify(m, mBuilder.build());
     }
 }

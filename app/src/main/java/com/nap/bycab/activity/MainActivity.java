@@ -203,7 +203,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                Toast.makeText(getApplicationContext(),"serviceClass: "+serviceClass.getName()+", "+service.service.getClassName(),Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Service destroyed!",Toast.LENGTH_LONG).show();
                 return true;
             }
         }
@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         Log.v(AppConstants.DEBUG_TAG, "notificationType " + notificationType);
 
-        if(notificationType == AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING){
+        if (notificationType == AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING){
 
             // handle direct implementation of current ride popup
             cancelStopNotification = true;
@@ -753,51 +753,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }*/
 
-    private void callLocationUpdate() {
-
-
-        JSONObject object=new JSONObject();
-        try {
-            object.put("Id", driver.getDriverId()+"");
-            object.put("Latitude",mCurrentLocation.getLatitude()+"");
-            object.put("Longitude",mCurrentLocation.getLongitude()+"");
-
-            Log.e("location update :",object+"");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        final ProgressDialog progressDialog=new ProgressDialog(MainActivity.this);
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        new PostServiceCall(AppConstants.UPDATE_LOCATION,object){
-
-            @Override
-            public void response(String response) {
-                progressDialog.dismiss();
-                Log.e("login Response: ",response+"");
-                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
-
-                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
-                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
-                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-                    snackbar.show();
-
-                }  else {
-                    Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
-                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
-                    snackbar.show();
-                }
-            }
-
-            @Override
-            public void error(String error) {
-                progressDialog.dismiss();
-            }
-        }.call();
-
-
-    }
 
     @Override
     public void updateDistance(double distance) {
