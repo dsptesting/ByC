@@ -68,14 +68,7 @@
                     android:textColor="#444"
                     android:textSize="12sp" />
 
-                <TextView
-                    android:layout_marginLeft="8dp"
-                    android:id="@+id/tvTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="06:20 AM"
-                    android:textColor="#444"
-                    android:textSize="12sp" />
+
             </LinearLayout>
 
 
@@ -151,7 +144,7 @@
                     android:textSize="16sp" />
                 <TextView
 
-                    android:id="@+id/tvMinutes"
+                    android:id="@+id/tvMinute"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="12 min ride"
@@ -169,7 +162,7 @@
                     android:textColor="#444"
                     android:textSize="16sp" />
                 <TextView
-                    android:id="@+id/tvWaitTime"
+                    android:id="@+id/tvWaitMinute"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="12 min hold"

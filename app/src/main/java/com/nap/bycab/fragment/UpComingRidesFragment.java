@@ -215,7 +215,7 @@ public class UpComingRidesFragment extends Fragment {
                 viewHolder.tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
                 viewHolder.tvKms = (TextView) convertView.findViewById(R.id.tvKms);
                 viewHolder.tvPlus2 = (TextView) convertView.findViewById(R.id.tvPlus2);
-                viewHolder.tvWaitTime = (TextView) convertView.findViewById(R.id.tvWaitTime);
+                viewHolder.tvWaitTime = (TextView) convertView.findViewById(R.id.tvWaitMinute);
 
                 convertView.setTag(viewHolder);
             }

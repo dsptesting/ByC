@@ -210,7 +210,8 @@ public class MyRidesFragment extends Fragment {
                 viewHolder.tvCustomerMobile = (TextView) convertView.findViewById(R.id.tvCustomerMobile);
                 viewHolder.tvCustomerName = (TextView) convertView.findViewById(R.id.tvCustomerName);
                 viewHolder.tvDate = (TextView) convertView.findViewById(R.id.tvDate);
-                viewHolder.tvTime = (TextView) convertView.findViewById(R.id.tvTime);
+                viewHolder.tvMinute = (TextView) convertView.findViewById(R.id.tvMinute);
+                viewHolder.tvWaitMinute = (TextView) convertView.findViewById(R.id.tvWaitMinute);
                 viewHolder.tvSrcValue = (TextView) convertView.findViewById(R.id.tvSrcValue);
                 viewHolder.tvDesValue = (TextView) convertView.findViewById(R.id.tvDesValue);
                 viewHolder.tvPrice = (TextView) convertView.findViewById(R.id.tvPrice);
@@ -230,12 +231,15 @@ public class MyRidesFragment extends Fragment {
             viewHolder.tvSrc.setVisibility(View.VISIBLE);
             viewHolder.tvDes.setVisibility(View.VISIBLE);
 
-            viewHolder.tvCustomerMobile.setText(""+ al.get(position).getCustMobile());
-            viewHolder.tvCustomerName.setText(""+ al.get(position).getCustName());
+            viewHolder.tvCustomerMobile.setText("" + al.get(position).getCustMobile());
+            viewHolder.tvCustomerName.setText("" + al.get(position).getCustName());
             viewHolder.tvPrice.setText("Total " + al.get(position).getAmount()+"\u20B9");
             viewHolder.tvKms.setText(""+ al.get(position).getKM()+" kms");
             viewHolder.tvSrcValue.setText(""+ al.get(position).getPickUpLocation());
             viewHolder.tvDesValue.setText(""+ al.get(position).getDropLocation());
+            viewHolder.tvDate.setText(al.get(position).getOrderDate()+" "+al.get(position).getTime() );
+            viewHolder.tvMinute.setText(al.get(position).getJournyTime()+ " min");
+            viewHolder.tvWaitMinute.setText(al.get(position).getWaitingTime()+ " min");
             return convertView;
         }
 
@@ -252,7 +256,7 @@ public class MyRidesFragment extends Fragment {
             TextView tvDes;
             TextView tvDesValue;
             TextView tvKms;
-            TextView tvPrice;
+            TextView tvPrice,tvMinute,tvWaitMinute;
         }
 
     }

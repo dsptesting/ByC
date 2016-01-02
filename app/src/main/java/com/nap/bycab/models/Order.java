@@ -29,22 +29,19 @@ public class Order {
     private String PickUpLocation;
     @SerializedName("Time")
     private String Time;
+    @SerializedName("WaitingTime")
+    private String WaitingTime;
+
 
     public Order() {
     }
 
-    public Order(String amount, String custMobile, String custName, String dropLocation, String journyTime, String KM, String orderDate, String orderId, String orderStatus, String pickUpLocation, String time) {
-        Amount = amount;
-        CustMobile = custMobile;
-        CustName = custName;
-        DropLocation = dropLocation;
-        JournyTime = journyTime;
-        this.KM = KM;
-        OrderDate = orderDate;
-        OrderId = orderId;
-        OrderStatus = orderStatus;
-        PickUpLocation = pickUpLocation;
-        Time = time;
+    public String getWaitingTime() {
+        return WaitingTime;
+    }
+
+    public void setWaitingTime(String waitingTime) {
+        WaitingTime = waitingTime;
     }
 
     @Override
