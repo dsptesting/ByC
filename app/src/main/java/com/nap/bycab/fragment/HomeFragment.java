@@ -7,10 +7,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -127,7 +129,7 @@ public class HomeFragment extends Fragment {
 
         String waitTime = String.format("%02d:%02d", waitMinute, waitSecond);
         String fairTime = String.format("%02d:%02d",  fairMinute, fairSeconds);
-        Log.e("time value...",waitTime+" "+fairTime+"");
+        Log.e("time value...", waitTime + " " + fairTime + "");
     }
 
     @Override
@@ -278,17 +280,22 @@ public class HomeFragment extends Fragment {
                     Snackbar snackbar=Snackbar.make(rootLayout, rideResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
-                } else {
+                }
+                else {
                     PrefUtils.setCurrentRideList(rideResponse, getActivity());
                     alCurrentRidesVp.clear();
                     ArrayList<Order> temp = PrefUtils.getCurrentRideList(getActivity()).getAlUpcomingRides();
 
+                    Log.v(AppConstants.DEBUG_TAG,"temp filled :"+temp.toString());
                     if(temp != null){
                         for(int i=0;i<temp.size();i++){
+
+                            Log.v(AppConstants.DEBUG_TAG,i+" temp status :"+temp.get(i).getOrderStatus());
                             if(temp.get(i).getOrderStatus() != null && temp.get(i).getOrderStatus().equalsIgnoreCase(""+AppConstants.ORDER_STATUS_PENDING)){
                                 alCurrentRidesVp.add(temp.get(i));
                             }
                         }
+                        Log.v(AppConstants.DEBUG_TAG,"alCurrentRidesVp filled :"+alCurrentRidesVp.toString());
                         vpCurrentRideAdapter.notifyDataSetChanged();
                     }
 
@@ -308,7 +315,52 @@ public class HomeFragment extends Fragment {
 
     }
 
+    private void callCancelStatusService(String orderId) {
 
+        final JSONObject object=new JSONObject();
+        try {
+            object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId() + "");
+            object.put("OrderId", "" + orderId);
+            object.put("Status", AppConstants.ORDER_STATUS_CANCEL);
+
+            Log.e(AppConstants.DEBUG_TAG, "callCancelStatusService " + object);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+       /* final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();*/
+        new PostServiceCall(AppConstants.UPDATE_ORDER_STATUS,object){
+
+            @Override
+            public void response(String response) {
+               // progressDialog.dismiss();
+                Log.e(AppConstants.DEBUG_TAG, "callCancelStatusService resp " + response);
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                }
+                else {
+                    /*Snackbar snackbar=Snackbar.make(rootLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();*/
+
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                Toast.makeText(getActivity(),"Something went wrong!",Toast.LENGTH_SHORT).show();
+               //progressDialog.dismiss();
+            }
+        }.call();
+    }
 
 
     private void callStatusService(boolean isAccept) {
@@ -604,7 +656,8 @@ public class HomeFragment extends Fragment {
         Animation animDown;
         Animation animUp;
         boolean isUpEnded;
-        ArrayList<Order> alCurrentRides;
+        public ArrayList<Order> alCurrentRides;
+        CountDownTimer countDownTimer;
 
         VpCurrentRideAdapter(Context context, ArrayList<Order> alCurrentRides){
 
@@ -651,11 +704,42 @@ public class HomeFragment extends Fragment {
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
 
-            Log.v(AppConstants.DEBUG_TAG,"instantiateItem : "+alCurrentRides.get(position) + ", position: "+position);
+            Log.v(AppConstants.DEBUG_TAG, "instantiateItem : " + alCurrentRides.get(position) + ", position: " + position);
 
             final View page = inflater.inflate(R.layout.ride_noti_layout, container, false);
-            ((TextView)page.findViewById(R.id.tvSrcValue)).setText(""+ alCurrentRides.get(position).getPickUpLocation());
+            ((TextView)page.findViewById(R.id.tvSrcValue)).setText("" + alCurrentRides.get(position).getPickUpLocation());
             ((TextView)page.findViewById(R.id.tvDesValue)).setText("" + alCurrentRides.get(position).getDropLocation());
+
+            final TextView tvCancel=(TextView)page.findViewById(R.id.tvCancel);
+            tvCancel.setTag(""+position);
+
+            tvCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if(countDownTimer!= null) countDownTimer.cancel();
+                    int p = Integer.parseInt(tvCancel.getTag().toString());
+                    cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                }
+            });
+
+            final TextView tvTimer=(TextView)page.findViewById(R.id.tvTimer);
+            tvTimer.setTag(""+position);
+
+            countDownTimer = new CountDownTimer(120*1000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    tvTimer.setText(""+millisUntilFinished/1000);
+                }
+
+                public void onFinish() {
+
+                    if(countDownTimer!= null) countDownTimer.cancel();
+                    int p = Integer.parseInt(tvCancel.getTag().toString());
+                    cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                }
+            };
+            countDownTimer.start();
 
             final TextView tvAccept=(TextView)page.findViewById(R.id.tvAccept);
             tvAccept.setOnClickListener(new View.OnClickListener() {
@@ -685,6 +769,21 @@ public class HomeFragment extends Fragment {
             return(page);
         }
 
+        public int removeViewFromPager (ViewPager pager, int position)
+        {
+            // ViewPager doesn't have a delete method; the closest is to set the adapter
+            // again.  When doing so, it deletes all its views.  Then we can delete the view
+            // from from the adapter and finally set the adapter to the pager again.  Note
+            // that we set the adapter to null before removing the view from "views" - that's
+            // because while ViewPager deletes all its views, it will call destroyItem which
+            // will in turn cause a null pointer ref.
+            pager.setAdapter(null);
+            alCurrentRides.remove(position);
+            pager.setAdapter(this);
+
+            return position;
+        }
+
         @Override
         public void destroyItem(ViewGroup container, int position,
                                 Object object) {
@@ -696,7 +795,7 @@ public class HomeFragment extends Fragment {
             return(alCurrentRides.size());
         }
         public int getItemPosition(Object object) {
-            return POSITION_NONE;
+            return POSITION_UNCHANGED;
         }
         /*@Override
         public float getPageWidth(int position) {
@@ -707,6 +806,13 @@ public class HomeFragment extends Fragment {
         public boolean isViewFromObject(View view, Object object) {
             return(view == object);
         }
+    }
+
+    private void cancelOrder(String orderId,int pos) {
+
+        // call cancel webservice..
+        callCancelStatusService(orderId);
+        vpCurrentRideAdapter.removeViewFromPager(pager, pos);
     }
 
     @Override

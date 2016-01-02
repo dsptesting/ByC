@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'nkdroid'
             keyPassword 'nkdroid'
-            storeFile file('/Users/nirav/Desktop/nkdroid.jks')
+            storeFile file('D:/Projects/Driver/nkdroid.jks')
             storePassword 'nkdroid'
         }
     }

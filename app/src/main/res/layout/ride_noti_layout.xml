@@ -26,7 +26,6 @@
                 android:id="@+id/tvSrc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
@@ -63,24 +62,66 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="5dp"
-                android:text="163, Ajit nagar
-                 lkasldkmnasjkl ndlkjsad asnd sadsad ksdjalkjsadalsk jsalkjd"
+                android:text="163, Ajit nagar lkasldkmnasjkl ndlkjsad asnd sadsad ksdjalkjsadalsk jsalkjd"
                 android:textColor="#fff"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/tvAccept"
-                android:layout_width="wrap_content"
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:clickable="true"
-                android:layout_marginBottom="7dp"
-                android:layout_marginRight="17dp"
-                android:background="@drawable/trans_selector"
-                android:padding="7dp"
-                android:text="Accept"
-                android:textColor="#fff"
-                android:textSize="19sp" />
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_centerVertical="true"
+                    android:text="120"
+                    android:textColor="#eee"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/tvCancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:layout_marginRight="17dp"
+                        android:background="@drawable/trans_selector"
+                        android:padding="7dp"
+                        android:text="Cancel"
+                        android:textColor="#fff"
+                        android:textSize="19sp" />
+
+                    <TextView
+                        android:id="@+id/tvAccept"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:layout_marginRight="17dp"
+                        android:background="@drawable/trans_selector"
+                        android:padding="7dp"
+                        android:text="Accept"
+                        android:textColor="#fff"
+                        android:textSize="19sp" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
 
         </LinearLayout>
     </android.support.v7.widget.CardView>
