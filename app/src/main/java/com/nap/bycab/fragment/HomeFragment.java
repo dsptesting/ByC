@@ -71,6 +71,7 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private ArrayList<Order> alCurrentRidesVp;
+    private ArrayList<Order> alCurrentRidesVpAll;
     private BottomViewPager pager=null;
     private CardView cvCurrentRideDetails;
     private String mParam1;
@@ -111,6 +112,7 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
         // Required empty public constructor
         alCurrentRidesVp = new ArrayList<>();
+        alCurrentRidesVpAll  = new ArrayList<>();
     }
 
     @Override
@@ -283,7 +285,7 @@ public class HomeFragment extends Fragment {
                 }
                 else {
                     PrefUtils.setCurrentRideList(rideResponse, getActivity());
-                    alCurrentRidesVp.clear();
+                    //alCurrentRidesVp.clear();
                     ArrayList<Order> temp = PrefUtils.getCurrentRideList(getActivity()).getAlUpcomingRides();
 
                     Log.v(AppConstants.DEBUG_TAG,"temp filled :"+temp.toString());
@@ -292,7 +294,19 @@ public class HomeFragment extends Fragment {
 
                             Log.v(AppConstants.DEBUG_TAG,i+" temp status :"+temp.get(i).getOrderStatus());
                             if(temp.get(i).getOrderStatus() != null && temp.get(i).getOrderStatus().equalsIgnoreCase(""+AppConstants.ORDER_STATUS_PENDING)){
-                                alCurrentRidesVp.add(temp.get(i));
+
+                                boolean isContain = false;
+                                for(int j=0;j<alCurrentRidesVp.size();j++){
+                                    if(alCurrentRidesVp.get(j).getOrderId().equalsIgnoreCase(""+temp.get(i).getOrderId())){
+
+                                        isContain = true;
+                                    }
+                                }
+
+                                if(!isContain){
+                                    alCurrentRidesVp.add(0,temp.get(i));
+                                }
+
                             }
                         }
                         Log.v(AppConstants.DEBUG_TAG,"alCurrentRidesVp filled :"+alCurrentRidesVp.toString());
