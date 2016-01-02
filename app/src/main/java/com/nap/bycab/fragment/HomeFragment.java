@@ -667,7 +667,8 @@ public class HomeFragment extends Fragment {
             animDown = AnimationUtils.loadAnimation(context,R.anim.slidedown);
             animDown.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animation animation) { }
+                public void onAnimationStart(Animation animation) {
+                }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -680,7 +681,8 @@ public class HomeFragment extends Fragment {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) { }
+                public void onAnimationRepeat(Animation animation) {
+                }
             });
 
             animUp = AnimationUtils.loadAnimation(context, R.anim.slideup);
@@ -717,9 +719,14 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    if(countDownTimer!= null) countDownTimer.cancel();
-                    int p = Integer.parseInt(tvCancel.getTag().toString());
-                    cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                    try{
+                        if(countDownTimer!= null) countDownTimer.cancel();
+                        int p = Integer.parseInt(tvCancel.getTag().toString());
+                        cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             });
 
@@ -734,9 +741,15 @@ public class HomeFragment extends Fragment {
 
                 public void onFinish() {
 
-                    if(countDownTimer!= null) countDownTimer.cancel();
-                    int p = Integer.parseInt(tvCancel.getTag().toString());
-                    cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                    try{
+                        if(countDownTimer!= null) countDownTimer.cancel();
+                        int p = Integer.parseInt(tvCancel.getTag().toString());
+                        cancelOrder(alCurrentRides.get(p).getOrderId(),p);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+
                 }
             };
             countDownTimer.start();
