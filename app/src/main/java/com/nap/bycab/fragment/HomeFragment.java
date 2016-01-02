@@ -492,7 +492,8 @@ public class HomeFragment extends Fragment {
 
                     ((MainActivity) getActivity()).myService.canRecordDistance(false);
                     PrefUtils.setServiceRunningInBackground(false, getActivity());
-                    ((MainActivity) getActivity()).myService.completeNotification();
+                    //TODO enable bellow line in future
+//                    ((MainActivity) getActivity()).myService.completeNotification();
 //                    long intervalOnPause = (SystemClock.elapsedRealtime() - mLastStopTime);
 //                    etWaitTimeVal.setBase(etWaitTimeVal.getBase() + intervalOnPause);
 
@@ -550,7 +551,8 @@ public class HomeFragment extends Fragment {
 
                     ((MainActivity) getActivity()).myService.canRecordDistance(true);
                     PrefUtils.setServiceRunningInBackground(true, getActivity());
-                    ((MainActivity) getActivity()).myService.createNotification(etTimeVal.getBase());
+                    //TODO enable bellow line in future
+//                    ((MainActivity) getActivity()).myService.createNotification(etTimeVal.getBase());
                 }
             }
         });

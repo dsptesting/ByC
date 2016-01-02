@@ -57,8 +57,8 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     private double distance = 0;
     int notif_id = 16;
     private ServiceCallback serviceCallback;
-    private NotificationManager mNotifyManager;
-    private NotificationCompat.Builder mBuilder;
+//    private NotificationManager mNotifyManager;
+//    private NotificationCompat.Builder mBuilder;
     protected GoogleApiClient mGoogleApiClient;
     protected Boolean mRequestingLocationUpdates;
     protected Location mCurrentLocation;
@@ -133,41 +133,41 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
             return LocationBackgroundService.this;
         }
     }
-
-    public void createNotification(long base){
-
-        Log.v(AppConstants.DEBUG_TAG, "SERVICE createNotification base:" + base);
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.putExtra("isNotificationLocation", true);
-        intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 6, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        long timeDifference = 0;
-        timeDifference  = base - SystemClock.elapsedRealtime();
-
-       /* RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.custom_notification_view);
-        Log.v(AppConstants.DEBUG_TAG,"noti chrono "+timeDifference + SystemClock.elapsedRealtime());
-        remoteViews.setChronometer(R.id.tvTimeLeft, timeDifference + SystemClock.elapsedRealtime(), null, true);
-        remoteViews.setTextViewText(R.id.title, " palak");*/
-
-
-        mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mBuilder = new NotificationCompat.Builder(LocationBackgroundService.this);
-        mBuilder.setContentIntent(contentIntent)
-                .setContentTitle("ByKab is running..")
-                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText("Your counter is ticking"))
-                .setContentText("Your counter is ticking")
-                .setSmallIcon(R.drawable.common_signin_btn_icon_disabled_dark)
-                .setUsesChronometer(true)
-                .setVibrate(new long[]{1000})
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-
-        timer.start();
-
-
-        startForeground(notif_id, mBuilder.getNotification());
-    }
+    //TODO enable bellow  in future
+//    public void createNotification(long base){
+//
+//        Log.v(AppConstants.DEBUG_TAG, "SERVICE createNotification base:" + base);
+//        Intent intent = new Intent(this, MainActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |   Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        intent.putExtra("isNotificationLocation", true);
+//        intent.putExtra("notificationType", AppConstants.NOTIFICATION_TYPE_LOCATION_COUNTING);
+//        PendingIntent contentIntent = PendingIntent.getActivity(this, 6, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        long timeDifference = 0;
+//        timeDifference  = base - SystemClock.elapsedRealtime();
+//
+//       /* RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.custom_notification_view);
+//        Log.v(AppConstants.DEBUG_TAG,"noti chrono "+timeDifference + SystemClock.elapsedRealtime());
+//        remoteViews.setChronometer(R.id.tvTimeLeft, timeDifference + SystemClock.elapsedRealtime(), null, true);
+//        remoteViews.setTextViewText(R.id.title, " palak");*/
+//
+//
+//        mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        mBuilder = new NotificationCompat.Builder(LocationBackgroundService.this);
+//        mBuilder.setContentIntent(contentIntent)
+//                .setContentTitle("ByKab is running..")
+//                .setStyle(new android.support.v4.app.NotificationCompat.BigTextStyle().bigText("Your counter is ticking"))
+//                .setContentText("Your counter is ticking")
+//                .setSmallIcon(R.drawable.common_signin_btn_icon_disabled_dark)
+//                .setUsesChronometer(true)
+//                .setVibrate(new long[]{1000})
+//                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+//
+//        timer.start();
+//
+//
+//        startForeground(notif_id, mBuilder.getNotification());
+//    }
 
     public void setCallback(ServiceCallback callbacks) {
         serviceCallback = callbacks;
@@ -390,17 +390,17 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         stopSelf();
 
     }
-
-    public void completeNotification(){
-
-        timer.stop();
-        //TODO set timer value to prefutils running ride... and delete running ride object once u reach fair activity..
-        Log.v(AppConstants.DEBUG_TAG,"SERVICE completeNotification");
-        stopForeground(true);
-        mBuilder.setAutoCancel(true);
-        mBuilder.setOngoing(false);
-        mNotifyManager.notify(notif_id, mBuilder.getNotification());
-        mNotifyManager.cancel(notif_id);
-
-    }
+    //TODO enable bellow  in future
+//    public void completeNotification(){
+//
+//        timer.stop();
+//        //TODO set timer value to prefutils running ride... and delete running ride object once u reach fair activity..
+//        Log.v(AppConstants.DEBUG_TAG,"SERVICE completeNotification");
+//        stopForeground(true);
+//        mBuilder.setAutoCancel(true);
+//        mBuilder.setOngoing(false);
+//        mNotifyManager.notify(notif_id, mBuilder.getNotification());
+//        mNotifyManager.cancel(notif_id);
+//
+//    }
 }

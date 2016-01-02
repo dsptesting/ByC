@@ -147,6 +147,7 @@ public class GcmMessageHandler extends IntentService {
         PendingIntent contentIntent = PendingIntent.getActivity(this, m, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(GcmMessageHandler.this)
                         .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true)
                         .setContentTitle(response.getString("contentTitle").toString())
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(response.getString("message").toString()))
                         .setContentText(response.getString("message").toString()+", "+m)
@@ -158,6 +159,6 @@ public class GcmMessageHandler extends IntentService {
         mBuilder.setContentIntent(contentIntent);
 
         // TODO... MIMP.. REMOVE THIS COMMENT TO ENABLE NOTIFICATION..
-        // mNotificationManager.notify(m, mBuilder.build());
+      mNotificationManager.notify(m, mBuilder.build());
     }
 }

@@ -113,7 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             if(cancelStopNotification){
 
-                myService.completeNotification();
+//                myService.completeNotification();
             }
         }
 
