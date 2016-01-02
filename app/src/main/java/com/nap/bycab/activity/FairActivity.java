@@ -53,7 +53,11 @@ public class FairActivity extends BaseActivity {
         llFair = (LinearLayout) findViewById(R.id.llFair);
 
         df = new DecimalFormat("0.00");
-
+        try {
+            HomeFragment.map.clear();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
       long  waitMinute = (ticket.getWaitTime() % 3600) / 60;
         long waitSecond = ticket.getWaitTime() % 60;
