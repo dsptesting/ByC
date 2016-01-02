@@ -37,6 +37,7 @@ import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
 import com.nap.bycab.fragment.HomeFragment;
 import com.nap.bycab.models.CommonResponse;
+import com.nap.bycab.models.Order;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.json.JSONException;
@@ -248,7 +249,15 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 //            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 15);
 //            HomeFragment.map.animateCamera(cameraUpdate);
             HomeFragment.map.clear();
-
+            try {
+                Order order=PrefUtils.getRunningRide(getApplicationContext());
+                if(order !=null){
+                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_smarker)).snippet(order.getPickUpLocation()));
+                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getDLatitude()), Double.parseDouble(order.getDLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dmarker)).snippet(order.getDropLocation()));
+                }
+            } catch (Exception e){
+             e.printStackTrace();
+            }
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
            // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             callLocationUpdate();

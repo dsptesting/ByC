@@ -29,9 +29,20 @@ public class Order {
     private String PickUpLocation;
     @SerializedName("Time")
     private String Time;
+    @SerializedName("Latitude")
+    private String Latitude;
+
+    @SerializedName("Longitude")
+    private String Longitude;
+
+    @SerializedName("DLatitude")
+    private String DLatitude;
+
+    @SerializedName("DLongitude")
+    private String DLongitude;
+
     @SerializedName("WaitingTime")
     private String WaitingTime;
-
 
     public Order() {
     }
@@ -59,6 +70,38 @@ public class Order {
                 ", PickUpLocation='" + PickUpLocation + '\'' +
                 ", Time='" + Time + '\'' +
                 '}';
+    }
+
+    public String getDLongitude() {
+        return DLongitude;
+    }
+
+    public void setDLongitude(String DLongitude) {
+        this.DLongitude = DLongitude;
+    }
+
+    public String getLatitude() {
+        return Latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        Latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return Longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        Longitude = longitude;
+    }
+
+    public String getDLatitude() {
+        return DLatitude;
+    }
+
+    public void setDLatitude(String DLatitude) {
+        this.DLatitude = DLatitude;
     }
 
     public String getAmount() {
