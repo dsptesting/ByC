@@ -249,14 +249,16 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 //            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 15);
 //            HomeFragment.map.animateCamera(cameraUpdate);
             HomeFragment.map.clear();
+
             try {
                 Order order=PrefUtils.getRunningRide(getApplicationContext());
-                if(order !=null){
-                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_smarker)).snippet(order.getPickUpLocation()));
-                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getDLatitude()), Double.parseDouble(order.getDLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dmarker)).snippet(order.getDropLocation()));
-                }
+                Log.e("marker info",Double.parseDouble(order.getLatitude())+" "+Double.parseDouble(order.getLongitude())+" "+order.getPickUpLocation());
+                HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getDLatitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_smarker)).snippet(order.getPickUpLocation()));
+                HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dmarker)).snippet(order.getDropLocation()));
+
             } catch (Exception e){
-             e.printStackTrace();
+                e.printStackTrace();
+                Log.e("error while adding marker",e+"");
             }
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
            // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
