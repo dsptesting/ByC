@@ -746,6 +746,7 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
+                    if(countDownTimer!= null) countDownTimer.cancel();
                     pager.startAnimation(animDown);
 
                     if(!isAccepted){
@@ -785,9 +786,9 @@ public class HomeFragment extends Fragment {
         }
 
         @Override
-        public void destroyItem(ViewGroup container, int position,
-                                Object object) {
+        public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
+            if(countDownTimer!= null) countDownTimer.cancel();
         }
 
         @Override
