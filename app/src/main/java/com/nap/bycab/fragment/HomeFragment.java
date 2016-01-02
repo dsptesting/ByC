@@ -119,6 +119,15 @@ public class HomeFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        long  waitMinute = (120 % 3600) / 60;
+        long waitSecond = 120 % 60;
+
+        long  fairMinute = (250 % 3600) / 60;
+        long fairSeconds = 250 % 60;
+
+        String waitTime = String.format("%02d:%02d", waitMinute, waitSecond);
+        String fairTime = String.format("%02d:%02d",  fairMinute, fairSeconds);
+        Log.e("time value...",waitTime+" "+fairTime+"");
     }
 
     @Override

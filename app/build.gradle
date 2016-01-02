@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'nkdroid'
             keyPassword 'nkdroid'
-            storeFile file('D:/Projects/Driver/nkdroid.jks')
+            storeFile file('/Users/nirav/Desktop/nkdroid.jks')
             storePassword 'nkdroid'
         }
     }
@@ -19,6 +19,7 @@ android {
         versionName "1.0"
         signingConfig signingConfigs.config
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -31,6 +32,7 @@ android {
             signingConfig signingConfigs.config
         }
     }
+
     productFlavors {
     }
 }

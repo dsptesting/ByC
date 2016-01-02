@@ -54,17 +54,27 @@ public class FairActivity extends BaseActivity {
 
         df = new DecimalFormat("0.00");
 
+
+      long  waitMinute = (ticket.getWaitTime() % 3600) / 60;
+        long waitSecond = ticket.getWaitTime() % 60;
+
+        long  fairMinute = (ticket.getDurationTime() % 3600) / 60;
+        long fairSeconds = ticket.getDurationTime() % 60;
+
+       String waitTime = String.format("%02d:%02d", waitMinute, waitSecond);
+        String fairTime = String.format("%02d:%02d",  fairMinute, fairSeconds);
+
         tvCustomerNameVal.setText(ticket.getUserName());
         tvCustomerNoVal.setText(ticket.getMobileNumber());
-        tvRideTimeVal.setText(ticket.getDurationTime() + "");
+        tvRideTimeVal.setText(fairTime+ "");
         if (ticket.getWaitTime() > 0) {
-            tvWaitValue.setText(ticket.getWaitTime() + "");
+            tvWaitValue.setText(waitTime + "");
         }
         else {
             tvWaitValue.setText(0 + "");
         }
 
-        tvDisVal.setText(df.format(ticket.getDistance()));
+        tvDisVal.setText(df.format(ticket.getDistance())+" Km");
 
         if (isPickupDropoff) {
             if (ticket.getDistance() > 2) {
@@ -118,16 +128,20 @@ public class FairActivity extends BaseActivity {
     private void callCompleteOrderService() {
         final JSONObject object = new JSONObject();
         try {
-            object.put("DriverId", PrefUtils.getCurrentDriver(FairActivity.this).getDriverId() + "");
-            object.put("OrderId", "" + PrefUtils.getRunningRide(FairActivity.this).getOrderId() + "");
-            object.put("Amount", df.format(totalAmount) + "");
-            object.put("JournyTime", PrefUtils.getTicketInfo(FairActivity.this).getDurationTime() + "");
-            object.put("KM", PrefUtils.getTicketInfo(FairActivity.this).getDistance() + "");
-            object.put("ServiceType", "1");
-            object.put("WaitingTime", PrefUtils.getTicketInfo(FairActivity.this).getWaitTime() + "");
-            object.put("Weight", "");
+            object.put("DriverId", PrefUtils.getCurrentDriver(FairActivity.this).getDriverId());
+            object.put("OrderId", "" + PrefUtils.getRunningRide(FairActivity.this).getOrderId());
+            object.put("Amount", df.format(totalAmount));
+            object.put("JournyTime", ticket.getDurationTime());
+            object.put("KM", df.format(ticket.getDistance()));
+            object.put("ServiceType", 1);
+            if (ticket.getWaitTime() > 0) {
+                object.put("WaitingTime", ticket.getWaitTime());
+            } else {
+                object.put("WaitingTime", 0);
+            }
+             object.put("Weight", 0);
 
-            Log.e(AppConstants.DEBUG_TAG, "callCompliteOrderStatus " + object);
+             Log.e(AppConstants.DEBUG_TAG, "callCompliteOrderStatus " + object);
         } catch (JSONException e) {
             e.printStackTrace();
         }
