@@ -224,7 +224,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
             String numWithNoExponents = num.toPlainString();
 
             Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
-            Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
             if(recordDistance && num.floatValue() > 10){
 
                 distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
@@ -297,7 +297,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
                 CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
 
                 if(commonResponse.getResponseId().equalsIgnoreCase("0")){
-                    Toast.makeText(getApplicationContext(),""+commonResponse.getResponseMessage(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getApplicationContext(),""+commonResponse.getResponseMessage(),Toast.LENGTH_SHORT).show();
                     /*Snackbar snackbar=Snackbar.make(mDrawerLayout, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();*/
@@ -311,7 +311,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             @Override
             public void error(String error) {
-                Toast.makeText(getApplicationContext(),""+error.toString(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),""+error.toString(),Toast.LENGTH_SHORT).show();
                 //progressDialog.dismiss();
             }
         }.call();

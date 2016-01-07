@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.fragment.HomeFragment;
@@ -21,7 +20,6 @@ import com.nap.bycab.models.Ticket;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,12 +28,10 @@ import java.text.DecimalFormat;
 public class FairActivity extends BaseActivity {
 
     private TextView tvCustomerNameVal, tvCustomerNoVal, tvRideTimeVal, tvDisVal, tvWaitValue, tvFairValue;
-
     private Ticket ticket;
     private double totalAmount;
     DecimalFormat df;
     private LinearLayout llFair;
-
     private boolean isPickupDropoff = false, isDelivery = false, isDriver = false;
 
     @Override
@@ -64,10 +60,8 @@ public class FairActivity extends BaseActivity {
 
         long  fairMinute = (ticket.getDurationTime() % 3600) / 60;
         long fairSeconds = ticket.getDurationTime() % 60;
-
        String waitTime = String.format("%02d:%02d", waitMinute, waitSecond);
         String fairTime = String.format("%02d:%02d",  fairMinute, fairSeconds);
-
         tvCustomerNameVal.setText(ticket.getUserName());
         tvCustomerNoVal.setText(ticket.getMobileNumber());
         tvRideTimeVal.setText(fairTime+ "");
@@ -77,9 +71,7 @@ public class FairActivity extends BaseActivity {
         else {
             tvWaitValue.setText(0 + "");
         }
-
         tvDisVal.setText(df.format(ticket.getDistance())+" Km");
-
         if (isPickupDropoff) {
             if (ticket.getDistance() > 2) {
                 double remainingDistance = ticket.getDistance() - 2;
@@ -93,7 +85,6 @@ public class FairActivity extends BaseActivity {
                 totalAmount = 15;
                 Log.e("total", totalAmount + "");
             }
-
             totalAmount = totalAmount + (((double) ticket.getDurationTime() / (double) 60) * (double) 0.75);
             Log.e("total minute", totalAmount + "");
             if (ticket.getWaitTime() > 0) {
@@ -103,6 +94,29 @@ public class FairActivity extends BaseActivity {
             }
             tvFairValue.setText("Total Rs." + df.format(totalAmount));
             Log.e("fianl total", totalAmount + "");
+        } else {
+
+            // Logic for delivery service
+
+            if (ticket.getDistance() > 5) {
+
+                // Km is bellow 5km
+                double remainingDistance = ticket.getDistance() - 5;
+
+                //km >5 but <7
+                if(remainingDistance<=2){
+                    totalAmount = (int) remainingDistance * 7;
+                } else{
+
+                    //when km >7
+                    // add 14 rs for 2km 7 rs/km
+                    // add 15 rs for greater then 7 km
+                    totalAmount = 19;
+                }
+                totalAmount=totalAmount+40;
+            } else {
+                totalAmount=totalAmount+40;
+            }
 
 
         }
@@ -144,38 +158,30 @@ public class FairActivity extends BaseActivity {
                 object.put("WaitingTime", 0);
             }
              object.put("Weight", 0);
-
              Log.e(AppConstants.DEBUG_TAG, "callCompliteOrderStatus " + object);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         final ProgressDialog progressDialog = new ProgressDialog(FairActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.show();
         new PostServiceCall(AppConstants.COMPLETE_ORDER, object) {
-
             @Override
             public void response(String response) {
                 progressDialog.dismiss();
                 Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
                 CommonResponse commonResponse = new GsonBuilder().create().fromJson(response, CommonResponse.class);
-
                 if (commonResponse.getResponseId().equalsIgnoreCase("0")) {
                     Snackbar snackbar = Snackbar.make(llFair, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
-
                 } else {
                     Snackbar snackbar = Snackbar.make(llFair, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
                     snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
                     snackbar.show();
                     //tvAccept.setText("Start");
-
                 }
-
             }
-
             @Override
             public void error(String error) {
                 progressDialog.dismiss();

@@ -13,11 +13,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.MainActivity;
+import com.nap.bycab.models.CommonResponse;
 import com.nap.bycab.models.Order;
 import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.util.AppConstants;
@@ -27,7 +29,10 @@ import com.nap.bycab.util.PrefUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class UpComingRidesFragment extends Fragment {
 
@@ -43,6 +48,7 @@ public class UpComingRidesFragment extends Fragment {
     private View view;
 
     private TextView tvUpcomingRideEmpty;
+
 
     public static UpComingRidesFragment newInstance(String param1, String param2) {
         UpComingRidesFragment fragment = new UpComingRidesFragment();
@@ -71,6 +77,8 @@ public class UpComingRidesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_upcoming_rides, container, false);
+
+
 
         ((MainActivity)getActivity()).getSupportActionBar().show();
 
@@ -127,9 +135,24 @@ public class UpComingRidesFragment extends Fragment {
 
         JSONObject object=new JSONObject();
         try {
-            object.put("Id", PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentDateandTime = sdf.format(new Date());
+
+            Date date = sdf.parse(currentDateandTime);
+
+            Calendar pastTime = Calendar.getInstance();
+            pastTime.setTime(date);
+
+
+            object.put("FromDate",sdf.format(pastTime.getTime()));
+            object.put("Id",PrefUtils.getCurrentDriver(getActivity()).getDriverId()+"");
+            object.put("ToDate","2099-12-12 12:12:12");
+
+
+
             Log.e(AppConstants.DEBUG_TAG,"callUpcomingRidesService request: "+ object.toString());
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -196,7 +219,7 @@ public class UpComingRidesFragment extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
 
             ViewHolder viewHolder;
 
@@ -216,21 +239,54 @@ public class UpComingRidesFragment extends Fragment {
                 viewHolder.tvKms = (TextView) convertView.findViewById(R.id.tvKms);
                 viewHolder.tvPlus2 = (TextView) convertView.findViewById(R.id.tvPlus2);
                 viewHolder.tvWaitTime = (TextView) convertView.findViewById(R.id.tvWaitMinute);
+                viewHolder.tvAccept= (TextView) convertView.findViewById(R.id.tvAccept);
+                viewHolder.tvCancel= (TextView) convertView.findViewById(R.id.tvCancel);
+                viewHolder.tvStatus= (TextView) convertView.findViewById(R.id.tvStatus);
+                viewHolder.rlActions= (RelativeLayout) convertView.findViewById(R.id.rlActions);
+                viewHolder.tvMinute= (TextView) convertView.findViewById(R.id.tvMinute);
 
                 convertView.setTag(viewHolder);
             }
             else{
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            viewHolder.tvDate.setText(al.get(position).getOrderDate()+" "+al.get(position).getTime());
 
+            viewHolder.tvMinute.setText(""+ al.get(position).getJournyTime()+" min");
             viewHolder.tvCustomerMobile.setText(""+ al.get(position).getCustMobile());
             viewHolder.tvCustomerName.setText(""+ al.get(position).getCustName());
             viewHolder.tvSrcValue.setText(""+ al.get(position).getPickUpLocation());
             viewHolder.tvDesValue.setText(""+ al.get(position).getDropLocation());
-            viewHolder.tvPrice.setText("approx " + al.get(position).getAmount()+"\u20B9");
-            viewHolder.tvKms.setText(""+ al.get(position).getKM()+" kms");
+            viewHolder.tvPrice.setText("approx " + al.get(position).getAmount() + "\u20B9");
+            viewHolder.tvKms.setText("" + al.get(position).getKM() + " kms");
             viewHolder.tvPlus2.setVisibility(View.GONE);
             viewHolder.tvWaitTime.setVisibility(View.GONE);
+
+            if(al.get(position).getOrderStatus().toString().equalsIgnoreCase(AppConstants.ORDER_STATUS_CANCEL+"")){
+                viewHolder.tvStatus.setText("Status: Canceled");
+                viewHolder.rlActions.setVisibility(View.GONE);
+            } else if(al.get(position).getOrderStatus().toString().equalsIgnoreCase(AppConstants.ORDER_STATUS_ACCEPT+"")) {
+                viewHolder.tvStatus.setText("Status: Accepted");
+                viewHolder.rlActions.setVisibility(View.GONE);
+            } else {
+                viewHolder.tvStatus.setText("Status: Pending");
+                viewHolder.rlActions.setVisibility(View.VISIBLE);
+            }
+            viewHolder.tvAccept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callStatusService(true,al.get(position).getOrderId());
+                }
+            });
+
+            viewHolder.tvCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    callStatusService(false,al.get(position).getOrderId());
+                }
+            });
+
+
             return convertView;
         }
 
@@ -246,11 +302,62 @@ public class UpComingRidesFragment extends Fragment {
             TextView tvKms;
             TextView tvPrice;
             TextView tvPlus2;
-            TextView tvWaitTime;
+            TextView tvWaitTime,tvAccept,tvCancel,tvStatus,tvMinute;
+            RelativeLayout rlActions;
         }
 
     }
 
 
+
+    private void callStatusService(boolean isAccept,String orderId) {
+
+        final JSONObject object=new JSONObject();
+        try {
+            object.put("DriverId", PrefUtils.getCurrentDriver(getActivity()).getDriverId() + "");
+            object.put("OrderId", orderId);
+            if(isAccept) {
+                object.put("Status", AppConstants.ORDER_STATUS_ACCEPT);
+            } else {
+                object.put("Status", AppConstants.    ORDER_STATUS_DRIVING);
+            }
+
+            Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService " + object);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        new PostServiceCall(AppConstants.UPDATE_ORDER_STATUS,object){
+
+            @Override
+            public void response(String response) {
+                progressDialog.dismiss();
+                Log.e(AppConstants.DEBUG_TAG, "callDriverStatusService resp " + response);
+                CommonResponse commonResponse=new GsonBuilder().create().fromJson(response,CommonResponse.class);
+
+                if(commonResponse.getResponseId().equalsIgnoreCase("0")){
+                    Snackbar snackbar=Snackbar.make(rootUpcomingRides, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+
+                } else {
+                    Snackbar snackbar=Snackbar.make(rootUpcomingRides, commonResponse.getResponseMessage(), Snackbar.LENGTH_LONG);
+                    snackbar.getView().setBackgroundColor(getResources().getColor(R.color.primaryColor));
+                    snackbar.show();
+                    //tvAccept.setText("Start");
+                    callUpcomingRidesService();
+                }
+            }
+
+            @Override
+            public void error(String error) {
+                progressDialog.dismiss();
+            }
+        }.call();
+    }
 
 }

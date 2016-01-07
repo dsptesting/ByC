@@ -184,6 +184,20 @@
                 android:textColor="#444"
                 android:textSize="20sp" />
 
+
+            <TextView
+                android:layout_gravity="right"
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+
+                android:text="Status: Pending"
+                android:textColor="#444"
+                android:textSize="16sp" />
+
             <RelativeLayout
                 android:id="@+id/rlActions"
                 android:layout_width="match_parent"
