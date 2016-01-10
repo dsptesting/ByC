@@ -96,7 +96,6 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             public void onFinish() {
                 if(mGoogleApiClient.isConnected()) startUpdatesButtonHandler();
-
             }
         }.start();
 
@@ -252,18 +251,23 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
 
             try {
                 Order order=PrefUtils.getRunningRide(getApplicationContext());
-                Log.e("marker info",Double.parseDouble(order.getLatitude())+" "+Double.parseDouble(order.getLongitude())+" "+order.getPickUpLocation());
-                HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getDLatitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_smarker)).snippet(order.getPickUpLocation()));
-                HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dmarker)).snippet(order.getDropLocation()));
 
-            } catch (Exception e){
+                if(order != null){
+                    Log.e("marker info",Double.parseDouble(order.getLatitude())+" "+Double.parseDouble(order.getLongitude())+" "+order.getPickUpLocation());
+                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getDLatitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_smarker)).snippet(order.getPickUpLocation()));
+                    HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLongitude()))).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_dmarker)).snippet(order.getDropLocation()));
+                }
+            }
+            catch (Exception e){
                 e.printStackTrace();
-                Log.e("error while adding marker",e+"");
+                Log.e(AppConstants.DEBUG_TAG,"error while adding marker: "+e+"");
             }
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
            // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
             callLocationUpdate();
-        } catch (Exception e){
+
+        }
+        catch (Exception e){
             e.printStackTrace();
         }
     }
@@ -333,7 +337,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(AppConstants.DEBUG_TAG, "Connected to GoogleApiClient");
-        if (mCurrentLocation == null) {
+        if (mCurrentLocation != null) {
             try {
                 mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 //prevLocation = mCurrentLocation;

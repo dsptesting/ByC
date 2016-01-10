@@ -3,8 +3,10 @@ package com.nap.bycab.fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.CountDownTimer;
@@ -40,6 +42,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.GsonBuilder;
 import com.nap.bycab.R;
 import com.nap.bycab.activity.FairActivity;
@@ -51,6 +54,8 @@ import com.nap.bycab.models.RideResponse;
 import com.nap.bycab.models.Ticket;
 import com.nap.bycab.util.AppConstants;
 import com.nap.bycab.util.BottomViewPager;
+import com.nap.bycab.util.HttpConnection;
+import com.nap.bycab.util.PathJSONParser;
 import com.nap.bycab.util.PostServiceCall;
 import com.nap.bycab.util.PrefUtils;
 
@@ -62,6 +67,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -71,7 +78,6 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private ArrayList<Order> alCurrentRidesVp;
-    private ArrayList<Order> alCurrentRidesVpAll;
     private BottomViewPager pager=null;
     private CardView cvCurrentRideDetails;
     private String mParam1;
@@ -111,8 +117,7 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment() {
         // Required empty public constructor
-        alCurrentRidesVp = new ArrayList<>();
-        alCurrentRidesVpAll  = new ArrayList<>();
+
     }
 
     @Override
@@ -145,19 +150,7 @@ public class HomeFragment extends Fragment {
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
 
-        timerCallCurrentRideService = new Timer();
-        timerCallCurrentRideService.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
 
-                Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
-
-                if (PrefUtils.getRunningRide(getActivity()) == null) {
-                    callCurrentRideService();
-                }
-
-            }
-        }, 10000, 60000);
 
         /*new CountDownTimer(3000, 1000) {
 
@@ -438,16 +431,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        vpCurrentRideAdapter = new VpCurrentRideAdapter(getActivity(),alCurrentRidesVp);
-
         cvCurrentRideDetails = (CardView) view.findViewById(R.id.cvCurrentRideDetails);
         pager=(BottomViewPager)view.findViewById(R.id.pager);
-        pager.setAdapter(vpCurrentRideAdapter);
-        pager.setOffscreenPageLimit(alCurrentRidesVp.size());
-        int margin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30*2,     getResources().getDisplayMetrics());
-        pager.setPageMargin(-margin);
-        pager.setPadding(30, 0, 30, 0);
-        pager.setClipToPadding(false);
+
 
 
 
@@ -481,6 +467,13 @@ public class HomeFragment extends Fragment {
         System.out.println(df.format(distance));
         finalDistance=distance;
         if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
+
+        if(PrefUtils.getRunningRide(getActivity()) != null){
+            Order order = PrefUtils.getRunningRide(getActivity());
+            String url = getMapsApiDirectionsUrl(Double.parseDouble(order.getLatitude()),Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLatitude()), Double.parseDouble(order.getDLongitude()));
+            ReadTask downloadTask = new ReadTask();
+            downloadTask.execute(url);
+        }
     }
 
     public void loadRunningRide() {
@@ -490,6 +483,90 @@ public class HomeFragment extends Fragment {
             pager.setVisibility(View.INVISIBLE);
             cvCurrentRideDetails.setVisibility(View.VISIBLE);
             loadRunningRideData();
+        }
+    }
+
+    private String getMapsApiDirectionsUrl(double srcLocLat, double srcLocLong, double desLocLat, double desLocLong) {
+
+        String waypoints = "waypoints=optimize:true|"
+                + srcLocLat + "," + srcLocLong
+                + "|" + "|" + desLocLat + ","+ desLocLong
+                /*+ "|" + WALL_STREET.latitude + ","+ WALL_STREET.longitude*/;
+
+        String sensor = "sensor=false";
+        String params = waypoints + "&" + sensor;
+        String output = "json";
+        String url = "https://maps.googleapis.com/maps/api/directions/"+ output + "?" + params;
+        return url;
+    }
+
+    private class ReadTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... url) {
+            String data = "";
+            try {
+                HttpConnection http = new HttpConnection();
+                data = http.readUrl(url[0]);
+            } catch (Exception e) {
+                Log.d("Background Task", e.toString());
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            new ParserTask().execute(result);
+        }
+    }
+
+    private class ParserTask extends
+            AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(
+                String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                PathJSONParser parser = new PathJSONParser();
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
+            ArrayList<LatLng> points = null;
+            PolylineOptions polyLineOptions = null;
+
+            // traversing through routes
+            for (int i = 0; i < routes.size(); i++) {
+                points = new ArrayList<LatLng>();
+                polyLineOptions = new PolylineOptions();
+                List<HashMap<String, String>> path = routes.get(i);
+
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                polyLineOptions.addAll(points);
+                polyLineOptions.width(2);
+                polyLineOptions.color(Color.BLUE);
+            }
+
+            map.addPolyline(polyLineOptions);
         }
     }
 
@@ -846,8 +923,34 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
 
+
         if(mapView != null) mapView.onResume();
         super.onResume();
+
+        alCurrentRidesVp = new ArrayList<>();
+
+        vpCurrentRideAdapter = new VpCurrentRideAdapter(getActivity(),alCurrentRidesVp);
+        pager.setAdapter(vpCurrentRideAdapter);
+        pager.setOffscreenPageLimit(alCurrentRidesVp.size());
+
+        int margin = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30*2,     getResources().getDisplayMetrics());
+        pager.setPageMargin(-margin);
+        pager.setPadding(30, 0, 30, 0);
+        pager.setClipToPadding(false);
+
+        timerCallCurrentRideService = new Timer();
+        timerCallCurrentRideService.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
+
+                if (PrefUtils.getRunningRide(getActivity()) == null) {
+                    callCurrentRideService();
+                }
+
+            }
+        }, 10000, 60000);
 
         if(isFromFairActivity) {
             cvCurrentRideDetails.setVisibility(View.INVISIBLE);
@@ -869,7 +972,7 @@ public class HomeFragment extends Fragment {
 
                     } catch (Exception e){
                         e.printStackTrace();
-                        Log.e("error while adding marker",e+"");
+                        Log.e(AppConstants.DEBUG_TAG,"error while adding marker : "+e+"");
                     }
 
                     HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
