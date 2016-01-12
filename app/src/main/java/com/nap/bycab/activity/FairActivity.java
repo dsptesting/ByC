@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -121,6 +122,13 @@ public class FairActivity extends BaseActivity {
 
         }
         callCompleteOrderService();
+
+        findViewById(R.id.tvOk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FairActivity.this.finish();
+            }
+        });
     }
 
     @Override

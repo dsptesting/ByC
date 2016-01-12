@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -434,7 +435,14 @@ public class HomeFragment extends Fragment {
         cvCurrentRideDetails = (CardView) view.findViewById(R.id.cvCurrentRideDetails);
         pager=(BottomViewPager)view.findViewById(R.id.pager);
 
-
+        view.findViewById(R.id.llSOS).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                callIntent.setData(Uri.parse("tel:9662519798"));
+                startActivity(callIntent);
+            }
+        });
 
 
     }
@@ -461,19 +469,22 @@ public class HomeFragment extends Fragment {
         LatLng latLng=new LatLng(map.getMyLocation().getLatitude(),map.getMyLocation().getLongitude());
     }
 
+    public void updateHomeFragmentPath(){
+
+        if(PrefUtils.getRunningRide(getActivity()) != null){
+            Order order = PrefUtils.getRunningRide(getActivity());
+            String url = getMapsApiDirectionsUrl(Double.parseDouble(order.getLatitude()), Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLatitude()), Double.parseDouble(order.getDLongitude()));
+            ReadTask downloadTask = new ReadTask();
+            downloadTask.execute(url);
+        }
+    }
+
     public void updateHomeFragmentDistance(double distance) {
 
         DecimalFormat df = new DecimalFormat("0.00");
         System.out.println(df.format(distance));
         finalDistance=distance;
         if(etKmVal != null) etKmVal.setText(""+df.format(distance)+ " kms");
-
-        if(PrefUtils.getRunningRide(getActivity()) != null){
-            Order order = PrefUtils.getRunningRide(getActivity());
-            String url = getMapsApiDirectionsUrl(Double.parseDouble(order.getLatitude()),Double.parseDouble(order.getLongitude()), Double.parseDouble(order.getDLatitude()), Double.parseDouble(order.getDLongitude()));
-            ReadTask downloadTask = new ReadTask();
-            downloadTask.execute(url);
-        }
     }
 
     public void loadRunningRide() {
@@ -489,14 +500,41 @@ public class HomeFragment extends Fragment {
     private String getMapsApiDirectionsUrl(double srcLocLat, double srcLocLong, double desLocLat, double desLocLong) {
 
         String waypoints = "waypoints=optimize:true|"
-                + srcLocLat + "," + srcLocLong
-                + "|" + "|" + desLocLat + ","+ desLocLong
+                + srcLocLat + "," + srcLocLong + "|" + "|"+ desLocLat + ","+ desLocLong
+                /*+ "|" + "|" + desLocLat + ","+ desLocLong*/
                 /*+ "|" + WALL_STREET.latitude + ","+ WALL_STREET.longitude*/;
 
+        String OriDest = "origin="+srcLocLat+","+srcLocLong+"&destination="+desLocLat+","+desLocLong;
+
         String sensor = "sensor=false";
-        String params = waypoints + "&" + sensor;
+        String params = OriDest+"&%20"+waypoints + "&" + sensor;
         String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions/"+ output + "?" + params;
+        String url = "https://maps.googleapis.com/maps/api/directions/"+ output + "?" + params+"&key=AIzaSyDYovepUKw5YUkjBxEtYLvRj146z9_7NIk";
+        Log.e(AppConstants.DEBUG_TAG, "1 url google path: " + url);
+        return url;
+    }
+
+    private String getDirectionsUrl(double srcLocLat, double srcLocLong, double desLocLat, double desLocLong){
+
+// Origin of route
+        String str_origin = "origin="+srcLocLat+","+srcLocLong;
+
+// Destination of route
+        String str_dest = "destination="+desLocLat+","+desLocLong;
+
+// Sensor enabled
+        String sensor = "sensor=false";
+
+// Building the parameters to the web service
+        String parameters = str_origin+"&"+str_dest+"&"+sensor;
+
+// Output format
+        String output = "json";
+
+// Building the url to the web service
+        String url = "https://maps.googleapis.com/maps/api/directions/"+output+"?"+parameters+"&key=AIzaSyDYovepUKw5YUkjBxEtYLvRj146z9_7NIk";
+
+        Log.e(AppConstants.DEBUG_TAG, "1 url google path: " + url);
         return url;
     }
 
@@ -507,7 +545,9 @@ public class HomeFragment extends Fragment {
             try {
                 HttpConnection http = new HttpConnection();
                 data = http.readUrl(url[0]);
-            } catch (Exception e) {
+                Log.e(AppConstants.DEBUG_TAG, "2 ReadTask google path: " + url);
+            }
+            catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
             return data;
@@ -520,8 +560,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private class ParserTask extends
-            AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
 
         @Override
         protected List<List<HashMap<String, String>>> doInBackground(
@@ -532,9 +571,11 @@ public class HomeFragment extends Fragment {
 
             try {
                 jObject = new JSONObject(jsonData[0]);
+                Log.e(AppConstants.DEBUG_TAG,"3 ParserTask jObject google path: "+jObject);
                 PathJSONParser parser = new PathJSONParser();
                 routes = parser.parse(jObject);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
             return routes;
@@ -545,28 +586,38 @@ public class HomeFragment extends Fragment {
             ArrayList<LatLng> points = null;
             PolylineOptions polyLineOptions = null;
 
-            // traversing through routes
-            for (int i = 0; i < routes.size(); i++) {
-                points = new ArrayList<LatLng>();
-                polyLineOptions = new PolylineOptions();
-                List<HashMap<String, String>> path = routes.get(i);
+            Log.e(AppConstants.DEBUG_TAG, "3 ParserTask routes google path: " + routes);
 
-                for (int j = 0; j < path.size(); j++) {
-                    HashMap<String, String> point = path.get(j);
+            try{
+                if(routes != null){
+                    // traversing through routes
+                    for (int i = 0; i < routes.size(); i++) {
+                        points = new ArrayList<LatLng>();
+                        polyLineOptions = new PolylineOptions();
+                        List<HashMap<String, String>> path = routes.get(i);
 
-                    double lat = Double.parseDouble(point.get("lat"));
-                    double lng = Double.parseDouble(point.get("lng"));
-                    LatLng position = new LatLng(lat, lng);
+                        for (int j = 0; j < path.size(); j++) {
+                            HashMap<String, String> point = path.get(j);
 
-                    points.add(position);
+                            double lat = Double.parseDouble(point.get("lat"));
+                            double lng = Double.parseDouble(point.get("lng"));
+                            LatLng position = new LatLng(lat, lng);
+
+                            points.add(position);
+                        }
+
+                        polyLineOptions.addAll(points);
+                        polyLineOptions.width(2);
+                        polyLineOptions.color(Color.BLUE);
+                    }
+
+                    map.addPolyline(polyLineOptions);
                 }
-
-                polyLineOptions.addAll(points);
-                polyLineOptions.width(2);
-                polyLineOptions.color(Color.BLUE);
+            }
+            catch (Exception e){
+                e.printStackTrace();
             }
 
-            map.addPolyline(polyLineOptions);
         }
     }
 
@@ -943,14 +994,19 @@ public class HomeFragment extends Fragment {
             @Override
             public void run() {
 
-                Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
+                try{
+                    Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
 
-                if (PrefUtils.getRunningRide(getActivity()) == null) {
-                    callCurrentRideService();
+                    if (PrefUtils.getRunningRide(getActivity()) == null) {
+                        callCurrentRideService();
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
                 }
 
             }
-        }, 10000, 60000);
+        }, 10000, 15000);
 
         if(isFromFairActivity) {
             cvCurrentRideDetails.setVisibility(View.INVISIBLE);

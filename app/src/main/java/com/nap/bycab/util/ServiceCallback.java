@@ -6,4 +6,6 @@ package com.nap.bycab.util;
 public interface ServiceCallback {
 
     void updateDistance(double distance);
+
+    void updatePath();
 }

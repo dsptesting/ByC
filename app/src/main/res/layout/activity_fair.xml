@@ -212,7 +212,7 @@
             </LinearLayout>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/tvLogiut"
+                android:id="@+id/tvOk"
                 card_view:cardCornerRadius="3dp"
                 card_view:cardElevation="2sp"
                 card_view:cardUseCompatPadding="true"

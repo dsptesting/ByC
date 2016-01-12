@@ -761,4 +761,12 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if(fragment != null)fragment.updateHomeFragmentDistance(distance);
 
     }
+
+    @Override
+    public void updatePath() {
+
+        HomeFragment fragment = (HomeFragment) getFragmentManager().findFragmentByTag("home_fragment");
+        if(fragment != null)fragment.updateHomeFragmentPath();
+
+    }
 }

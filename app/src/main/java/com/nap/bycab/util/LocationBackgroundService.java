@@ -232,8 +232,11 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
                 Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
 
                 prevLocation = location;
-                serviceCallback.updateDistance(distance);
+
+                if(serviceCallback != null) serviceCallback.updateDistance(distance);
             }
+
+            if(serviceCallback != null) serviceCallback.updatePath();
         }
         else{
             prevLocation = location;
