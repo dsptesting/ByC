@@ -107,6 +107,8 @@ public class HomeFragment extends Fragment {
     public  static boolean isFromFairActivity=false;
     private Timer timerCallCurrentRideService;
 
+    private TextView txtLocationUpdate,txtCurrentRide;
+
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -150,9 +152,31 @@ public class HomeFragment extends Fragment {
 
         lvCustomerCall= (LinearLayout) view.findViewById(R.id.lvCustomerCall);
         rootLayout= (RelativeLayout) view.findViewById(R.id.rootLayout);
+        txtLocationUpdate= (TextView) view.findViewById(R.id.txtLocationUpdate);
+        txtCurrentRide= (TextView) view.findViewById(R.id.txtCurrentRide);
 
+        txtLocationUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).myService.callLocationUpdate();
+            }
+        });
 
+        txtCurrentRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                                try{
+                    Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
 
+                    if (PrefUtils.getRunningRide(getActivity()) == null) {
+                        callCurrentRideService();
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
         /*new CountDownTimer(3000, 1000) {
 
             public void onTick(long millisUntilFinished) {
@@ -710,7 +734,7 @@ public class HomeFragment extends Fragment {
 
                     etTimeVal.setBase(SystemClock.elapsedRealtime());
                     etTimeVal.stop();
-
+                    etWaitTimeVal.stop();
 //                    Intent i=new Intent(getActivity(), FairActivity.class);
 //                    startActivity(i);
 
@@ -990,23 +1014,25 @@ public class HomeFragment extends Fragment {
         pager.setClipToPadding(false);
 
         timerCallCurrentRideService = new Timer();
-        timerCallCurrentRideService.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
 
-                try{
-                    Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
-
-                    if (PrefUtils.getRunningRide(getActivity()) == null) {
-                        callCurrentRideService();
-                    }
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-        }, 10000, 15000);
+//        //TODO nkdroid
+//        timerCallCurrentRideService.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//                try{
+//                    Log.v(AppConstants.DEBUG_TAG, "getRunningRide : " + PrefUtils.getRunningRide(getActivity()));
+//
+//                    if (PrefUtils.getRunningRide(getActivity()) == null) {
+//                        callCurrentRideService();
+//                    }
+//                }
+//                catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }, 10000, 15000);
 
         if(isFromFairActivity) {
             cvCurrentRideDetails.setVisibility(View.INVISIBLE);

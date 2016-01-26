@@ -86,11 +86,11 @@ public class FairActivity extends BaseActivity {
                 totalAmount = 15;
                 Log.e("total", totalAmount + "");
             }
-            totalAmount = totalAmount + (((double) ticket.getDurationTime() / (double) 60) * (double) 0.75);
+            totalAmount = totalAmount + ((int) Math.ceil(((double) ticket.getDurationTime() / (double) 60)) * (double) 1);
             Log.e("total minute", totalAmount + "");
             if (ticket.getWaitTime() > 0) {
 
-                totalAmount = totalAmount + (((double) ticket.getWaitTime() / (double) 60) * (double) 2);
+                totalAmount = totalAmount +((int) Math.ceil(((double) ticket.getWaitTime() / (double) 60))* (double) 2);
                 Log.e("total wait time", totalAmount + "");
             }
             tvFairValue.setText("Total Rs." + df.format(totalAmount));
@@ -157,11 +157,11 @@ public class FairActivity extends BaseActivity {
             object.put("DriverId", PrefUtils.getCurrentDriver(FairActivity.this).getDriverId());
             object.put("OrderId", "" + PrefUtils.getRunningRide(FairActivity.this).getOrderId());
             object.put("Amount", df.format(totalAmount));
-            object.put("JournyTime", ticket.getDurationTime());
+            object.put("JournyTime",(int) Math.ceil(((double) ticket.getDurationTime() / (double) 60))+"");
             object.put("KM", df.format(ticket.getDistance()));
             object.put("ServiceType", 1);
             if (ticket.getWaitTime() > 0) {
-                object.put("WaitingTime", ticket.getWaitTime());
+                object.put("WaitingTime",  (int) Math.ceil(((double) ticket.getWaitTime() / (double) 60))+"");
             } else {
                 object.put("WaitingTime", 0);
             }

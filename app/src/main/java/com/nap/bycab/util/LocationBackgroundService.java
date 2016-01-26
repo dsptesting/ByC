@@ -64,7 +64,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
     protected Boolean mRequestingLocationUpdates;
     protected Location mCurrentLocation;
     protected LocationRequest mLocationRequest;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 12000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final IBinder mBinder = new MyBinder();
     private boolean recordDistance;
@@ -223,16 +223,12 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
             String numWithNoExponents = num.toPlainString();
 
             Log.d(AppConstants.DEBUG_TAG, "meter numWithNoExponents " + numWithNoExponents);
-//            Toast.makeText(this, "dist: "+numWithNoExponents, Toast.LENGTH_SHORT).show();
-            if(recordDistance && num.floatValue() > 10){
-
+//            Toast.makeText(this, "float value: "+num.floatValue(), Toast.LENGTH_SHORT).show();
+            if(recordDistance && num.floatValue() > 100){
                 distance = distance + distanceCalculator.distance(prevLocation.getLatitude(),prevLocation.getLongitude(), location.getLatitude(),location.getLongitude(),"K");
-
-
                 Log.v(AppConstants.DEBUG_TAG,"onLocationChanged distance : "+ distance);
-
                 prevLocation = location;
-
+//                Toast.makeText(this, "dist: "+distance, Toast.LENGTH_SHORT).show();
                 if(serviceCallback != null) serviceCallback.updateDistance(distance);
             }
 
@@ -241,7 +237,6 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         else{
             prevLocation = location;
         }
-
 
         mCurrentLocation = location;
         double latitude = mCurrentLocation.getLatitude();
@@ -267,7 +262,9 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
             }
             HomeFragment.map.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker)).snippet("Me"));
            // Toast.makeText(this, mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-            callLocationUpdate();
+
+            //TODO nkdroid
+//            callLocationUpdate();
 
         }
         catch (Exception e){
@@ -279,7 +276,7 @@ public class LocationBackgroundService extends Service implements GoogleApiClien
         return  mCurrentLocation;
     }
 
-    private void callLocationUpdate() {
+    public void callLocationUpdate() {
 
         JSONObject object=new JSONObject();
         try {
