@@ -1,9 +1,39 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.nap.bycab.fragment.ContactUsFragment">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    tools:context="com.nap.bycab.fragment.ContactUsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <TextView
+        android:textColor="#000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ByKaB - Transforming Transit
+602, World Trade Centre, Sayajigunj, Vadodara-05." />
 
-</FrameLayout>
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:clickable="true"
+        android:id="@+id/tvMobile"
+        android:textColor="#000"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0265-6540999" />
+
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:clickable="true"
+        android:id="@+id/tvEmail"
+        android:textColor="#000"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="operations@bykab.in" />
+
+</LinearLayout>

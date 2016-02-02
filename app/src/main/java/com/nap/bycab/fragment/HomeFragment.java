@@ -462,7 +462,9 @@ public class HomeFragment extends Fragment {
         view.findViewById(R.id.llSOS).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent callIntent = new Intent(Intent.ACTION_DIAL);
+
+
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:9662519798"));
                 startActivity(callIntent);
             }

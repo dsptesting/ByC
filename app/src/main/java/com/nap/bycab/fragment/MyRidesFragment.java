@@ -218,6 +218,8 @@ public class MyRidesFragment extends Fragment {
                 viewHolder.tvKms = (TextView) convertView.findViewById(R.id.tvKms);
                 viewHolder.tvSrc = (TextView) convertView.findViewById(R.id.tvSrc);
                 viewHolder.tvDes = (TextView) convertView.findViewById(R.id.tvDes);
+                viewHolder.tvStatus = (TextView) convertView.findViewById(R.id.tvStatus);
+
 
                 convertView.setTag(viewHolder);
             }
@@ -230,6 +232,18 @@ public class MyRidesFragment extends Fragment {
             viewHolder.tvDesValue.setVisibility(View.VISIBLE);
             viewHolder.tvSrc.setVisibility(View.VISIBLE);
             viewHolder.tvDes.setVisibility(View.VISIBLE);
+
+            if(al.get(position).getOrderStatus().equalsIgnoreCase(AppConstants.ORDER_STATUS_PENDING+"")){
+                viewHolder.tvStatus.setText("Pending");
+            } else if(al.get(position).getOrderStatus().equalsIgnoreCase(AppConstants.ORDER_STATUS_DRIVING+"")){
+                viewHolder.tvStatus.setText("Driving");
+            }else if(al.get(position).getOrderStatus().equalsIgnoreCase(AppConstants.ORDER_STATUS_COMPLETE+"")){
+                viewHolder.tvStatus.setText("Completed");
+            }else if(al.get(position).getOrderStatus().equalsIgnoreCase(AppConstants.ORDER_STATUS_CANCEL+"")){
+                viewHolder.tvStatus.setText("Cancelled");
+            }else if(al.get(position).getOrderStatus().equalsIgnoreCase(AppConstants.ORDER_STATUS_ACCEPT+"")){
+                viewHolder.tvStatus.setText("Accepted");
+            }
 
             viewHolder.tvCustomerMobile.setText("" + al.get(position).getCustMobile());
             viewHolder.tvCustomerName.setText("" + al.get(position).getCustName());
@@ -256,7 +270,7 @@ public class MyRidesFragment extends Fragment {
             TextView tvDes;
             TextView tvDesValue;
             TextView tvKms;
-            TextView tvPrice,tvMinute,tvWaitMinute;
+            TextView tvPrice,tvMinute,tvWaitMinute,tvStatus;
         }
 
     }

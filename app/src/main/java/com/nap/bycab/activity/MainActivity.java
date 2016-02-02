@@ -498,7 +498,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             case R.id.navigation_item_2:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                toolbar.setTitle("My Ride");
+                toolbar.setTitle("My Rides");
                 toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
                 fragmentManager = getFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
@@ -531,16 +531,16 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             case R.id.navigation_item_5:
                 mDrawerLayout.closeDrawer(GravityCompat.START);
-                /*toolbar.setTitle("About Us");
+                toolbar.setTitle("About Us");
                 toolbar.setBackgroundColor(getResources().getColor(R.color.primaryColor));
                 fragmentManager = getFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
                 AboutUsFragment aboutUsFragment = AboutUsFragment.newInstance("","");
                 fragmentTransaction.replace(R.id.main_container, aboutUsFragment);
-                fragmentTransaction.commit();*/
+                fragmentTransaction.commit();
 
                 Intent iii=new Intent(MainActivity.this,FairActivity.class);
-                startActivity(iii);
+//                startActivity(iii);
 
                 break;
 
